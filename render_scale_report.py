@@ -32,6 +32,7 @@ UNIVERSE_PATH_CANDIDATES = [
     "../limitup-precursor-research/research_cache/universe_full.json",
 ]
 TOP_N = 20  # 2026-09-04 사용자 요청("추천 종목 20개로 확장") -- 기존 15개에서 확대
+SPARKLINE_DAYS = 40  # 종목별 최근 가격 흐름 미니 그래프용
 
 
 def _resolve_path(candidates, label):
@@ -212,7 +213,7 @@ def build_report():
             "leg_dir": pos["leg_dir"], "leg_pct": pos["leg_pct"],
             "leg_days": pos["leg_days"], "depth_pct": depth_pct, "cur_price": entry_price,
             "yr_pos": yr_pos, "risk_flag": risk_flag, "vr": vr, "fast_rev": fast_rev,
-            "last_date": dates_idx[-1],
+            "last_date": dates_idx[-1], "recent_closes": closes[-SPARKLINE_DAYS:],
         })
 
     rows.sort(key=lambda r: (-r["score"], -r["depth_pct"]))
@@ -252,6 +253,48 @@ def _tier_of(score):
     return "짐"
 
 
+def _seesaw_svg(score):
+    """2026-09-04 사용자 요청("사이트에 맞는 그래프... 저울 시소") -- 점수(-5~+5)를 실제
+    시소(받침점+빔) 기울기로 시각화. 오른쪽(양수, 오를 이유)이 무거우면 오른쪽이 내려가고,
+    왼쪽(음수, 내릴 이유)이 무거우면 왼쪽이 내려간다 -- 기존 줄다리기 가로게이지(ZZ)와 달리
+    "저울" 이름과 직접 맞는 형태로 새로 디자인."""
+    clamped = max(-5, min(5, score))
+    angle = -clamped * 3.2  # 점수 5당 16도 정도 기울임(양수=오른쪽이 아래로 -> 화면상 시계반대)
+    color = "#0a8a3c" if clamped > 0 else ("#c0392b" if clamped < 0 else "#898781")
+    left_r = 3 + max(0, -clamped) * 0.9
+    right_r = 3 + max(0, clamped) * 0.9
+    return f'''<svg width="64" height="40" viewBox="0 0 64 40">
+      <polygon points="32,24 27,36 37,36" fill="#c9c6ba"/>
+      <g transform="rotate({angle:.1f} 32 22)">
+        <line x1="6" y1="22" x2="58" y2="22" stroke="{color}" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="6" cy="22" r="{left_r:.1f}" fill="{'#c0392b' if clamped < 0 else '#c9c6ba'}"/>
+        <circle cx="58" cy="22" r="{right_r:.1f}" fill="{'#0a8a3c' if clamped > 0 else '#c9c6ba'}"/>
+      </g>
+    </svg>'''
+
+
+def _sparkline_svg(closes):
+    """최근 가격 흐름(최대 SPARKLINE_DAYS일) 미니 선그래프. 별도 라이브러리 없이 순수 SVG
+    polyline -- V3/콜라 다른 화면들도 자체완결형 SVG 차트를 쓰는 것과 같은 톤."""
+    if len(closes) < 2:
+        return ""
+    lo, hi = min(closes), max(closes)
+    span = (hi - lo) or 1.0
+    w, h, pad = 120, 32, 3
+    step = (w - 2 * pad) / (len(closes) - 1)
+    points = []
+    for i, c in enumerate(closes):
+        x = pad + i * step
+        y = pad + (1 - (c - lo) / span) * (h - 2 * pad)
+        points.append(f"{x:.1f},{y:.1f}")
+    color = "#0a8a3c" if closes[-1] >= closes[0] else "#c0392b"
+    last_x, last_y = points[-1].split(",")
+    return f'''<svg width="{w}" height="{h}" viewBox="0 0 {w} {h}">
+      <polyline points="{" ".join(points)}" fill="none" stroke="{color}" stroke-width="1.5"/>
+      <circle cx="{last_x}" cy="{last_y}" r="2" fill="{color}"/>
+    </svg>'''
+
+
 def render_html(top_rows, total_candidates):
     """2026-09-04 사용자 요청("사이트를 만들어서 거기서 볼 수 있게") -- GitHub Pages로 배포할
     정적 HTML. V3/콜라 대시보드 계열과 같은 톤(단순 표+색 배지)으로 통일, 별도 프레임워크 없이
@@ -269,6 +312,8 @@ def render_html(top_rows, total_candidates):
       <td style="color:#898781;font-variant-numeric:tabular-nums;">{r['code']}</td>
       <td><span style="color:{color};background:{bg};border-radius:6px;padding:2px 8px;font-weight:700;">
           {r['score']:+d} {tier}</span></td>
+      <td>{_seesaw_svg(r['score'])}</td>
+      <td>{_sparkline_svg(r.get('recent_closes') or [])}</td>
       <td>하락다리 {r['leg_days']}일째</td>
       <td style="color:{'#0a8a3c' if r['leg_pct'] >= 0 else '#c0392b'};">{r['leg_pct']:+.1f}%</td>
       <td>{r['depth_pct']:.1f}%p</td>
@@ -282,23 +327,28 @@ def render_html(top_rows, total_candidates):
 <title>저울 -- 코스피+코스닥 상위 {len(top_rows)}</title>
 <style>
   body {{ font-family: -apple-system, "Malgun Gothic", sans-serif; background:#faf9f6; color:#1c1d1f;
-         max-width: 900px; margin: 0 auto; padding: 24px 16px; }}
+         max-width: 1180px; margin: 0 auto; padding: 24px 16px; }}
   h1 {{ font-size: 20px; margin-bottom: 4px; }}
   .sub {{ color:#70706a; font-size: 13px; margin-bottom: 20px; }}
-  table {{ width: 100%; border-collapse: collapse; font-size: 13px; }}
-  th {{ text-align:left; border-bottom: 2px solid #1c1d1f; padding: 8px 6px; color:#5a5650; }}
-  td {{ border-bottom: 1px solid #e5e3dc; padding: 8px 6px; }}
+  .table-scroll {{ overflow-x: auto; }}
+  table {{ width: 100%; min-width: 900px; border-collapse: collapse; font-size: 13px; }}
+  th {{ text-align:left; border-bottom: 2px solid #1c1d1f; padding: 8px 6px; color:#5a5650;
+       white-space: nowrap; }}
+  td {{ border-bottom: 1px solid #e5e3dc; padding: 8px 6px; vertical-align: middle; }}
   .note {{ margin-top: 20px; font-size: 12.5px; color:#898781; line-height:1.6; }}
 </style>
 </head><body>
   <h1>⚖ 저울 -- 코스피+코스닥 상위 {len(top_rows)}</h1>
   <div class="sub">기준일 {base_date} · 하락다리(반등기대) 후보 {total_candidates}종목 중 상위 {len(top_rows)} ·
     강한이김(≥2점) {strong_count}개</div>
+  <div class="table-scroll">
   <table>
-    <tr><th>#</th><th>종목명</th><th>코드</th><th>저울점수</th><th>기간</th><th>다리등락%</th>
+    <tr><th>#</th><th>종목명</th><th>코드</th><th>저울점수</th><th>시소</th><th>최근흐름</th>
+        <th>기간</th><th>다리등락%</th>
         <th>되돌림깊이</th><th>52주위치</th><th style="text-align:right;">현재가</th></tr>
     {"".join(rows_html)}
   </table>
+  </div>
   <div class="note">
     ≥2점(강한이김)만 실측상 신뢰할 수 있는 신호입니다(도달률 72.8%/평균 +0.49%) -- 1점 이하는
     평균이 오히려 마이너스였습니다. 매일 17:10(KST) 자동 갱신됩니다.
