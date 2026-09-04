@@ -11,6 +11,7 @@
 여부 -- 이 캐시엔 OHLCV만 있고 재무/투자자 데이터가 없어서, V3의 "객관가치" 배지처럼 전부
 넣으려면 별도 데이터소스(DART, KRX 관리종목 리스트 등)를 새로 연결해야 한다.
 """
+import os
 import pickle
 import statistics
 from datetime import datetime
@@ -19,8 +20,25 @@ THRESHOLD = 0.03
 MIN_DEPTH = 2.0  # 상위 15개를 뽑는 용도라 문턱을 낮게 잡아 후보군을 넓게 본다(2%p+)
 RISK_RECOVERY_MIN = 3.0
 TUG_OF_WAR_RISK_PENALTY = 3
-CACHE_PATH = "../_상한가전조연구/research_cache/limitup_ohlcv_cache.pkl"
+# 2026-09-04 -- 로컬 데스크톱(_상한가전조연구, 한글 폴더명)과 클라우드 라우틴(같이 클론되는
+# limitup-precursor-research, 저장소 이름 그대로)이 서로 다른 폴더명을 쓰므로 둘 다 후보로
+# 시도한다 -- 콜라 캐시를 읽기전용 재사용하는 원칙은 같지만 실행 환경마다 경로만 다름.
+CACHE_PATH_CANDIDATES = [
+    "../_상한가전조연구/research_cache/limitup_ohlcv_cache.pkl",
+    "../limitup-precursor-research/research_cache/limitup_ohlcv_cache.pkl",
+]
 TOP_N = 15
+
+
+def _resolve_cache_path():
+    for path in CACHE_PATH_CANDIDATES:
+        if os.path.exists(path):
+            return path
+    raise FileNotFoundError(
+        "콜라 캐시(limitup_ohlcv_cache.pkl)를 찾을 수 없습니다. 시도한 경로: "
+        + ", ".join(CACHE_PATH_CANDIDATES)
+        + " -- limitup-precursor-research 저장소가 이 저장소와 같은 부모 폴더에 클론돼 있는지 확인하세요."
+    )
 
 
 def zigzag_swings(closes, threshold=THRESHOLD):
@@ -133,7 +151,7 @@ def year_range_position_pct(closes, highs, lows):
 
 
 def build_report():
-    with open(CACHE_PATH, "rb") as f:
+    with open(_resolve_cache_path(), "rb") as f:
         cache = pickle.load(f)
 
     rows = []
