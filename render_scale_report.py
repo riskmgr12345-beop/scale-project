@@ -311,7 +311,7 @@ def _detail_chart_svg(r):
         return "<div>데이터 부족</div>"
 
     w, h = 1000, 420
-    pad_x, top_pad, bottom_pad = 40, 95, 95
+    pad_x, top_pad, bottom_pad = 40, 110, 95
     lo, hi = min(closes), max(closes)
     span = (hi - lo) or 1.0
     plot_h = h - top_pad - bottom_pad
@@ -371,9 +371,12 @@ def _detail_chart_svg(r):
     leg_marker = ""
     if leg_start_idx is not None:
         lx = xs[leg_start_idx]
+        # 2026-09-04 -- 다리 시작점 라벨이 그 점 자신의 위쪽 3줄 스택(최악의 경우 top_pad-36)과
+        # 겹칠 수 있어(다리 시작=보통 국지적 고점이라 above 배치의 y1 최솟값 근처에 자주 위치),
+        # top_pad를 넉넉히 키우고 이 라벨을 그보다 더 위(top_pad-45)에 고정해 항상 비켜가게 한다.
         leg_marker = (f'<line x1="{lx:.1f}" y1="{top_pad - 6:.1f}" x2="{lx:.1f}" y2="{h - bottom_pad + 6:.1f}" '
                       f'stroke="#5b3fa0" stroke-width="1" stroke-dasharray="3,3"/>'
-                      f'<text x="{lx:.1f}" y="{top_pad - 12:.1f}" font-size="11" font-weight="700" '
+                      f'<text x="{lx:.1f}" y="{top_pad - 45:.1f}" font-size="11" font-weight="700" '
                       f'fill="#5b3fa0" text-anchor="middle">다리 시작</text>')
 
     return f'''<svg width="100%" viewBox="0 0 {w} {h}">
