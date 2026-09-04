@@ -104,6 +104,26 @@ def zigzag_swings(closes, threshold=THRESHOLD):
     return swings
 
 
+def _historical_touch_points(closes, lows, min_depth=MIN_DEPTH):
+    """2026-09-04 사용자 요청("과거에도 터치가 일어났었지?" -> "해줘") -- 이 창(window) 안에서
+    지그재그 하락다리마다 처음으로 depth_pct>=min_depth를 넘긴 지점(=검증 스크립트의
+    find_touch_entries와 같은 정의)을 전부 찾아 돌려준다. 마지막 다리(진행 중)는 오늘 자체가
+    이미 별도로(원 마커) 표시되므로 여기선 제외."""
+    swings = zigzag_swings(closes)
+    touches = []
+    for i in range(len(swings) - 1):
+        idx0, p0 = swings[i]
+        idx1, p1 = swings[i + 1]
+        if p1 >= p0:
+            continue
+        for j in range(idx0, idx1 + 1):
+            depth = (p0 - lows[j]) / p0 * 100 if p0 else 0.0
+            if depth >= min_depth:
+                touches.append((j, depth))
+                break
+    return touches
+
+
 def current_position(dates_idx, closes):
     """지금(캐시 마지막 날) 기준 진행 중인 다리 정보. swings[-2]->swings[-1]이 진행 중인 구간."""
     swings = zigzag_swings(closes)
@@ -218,7 +238,7 @@ def build_report():
             "depth_pct": depth_pct, "cur_price": entry_price,
             "yr_pos": yr_pos, "risk_flag": risk_flag, "vr": vr, "fast_rev": fast_rev,
             "last_date": dates_idx[-1], "recent_closes": closes[-SPARKLINE_DAYS:],
-            "recent_dates": list(dates_idx[-SPARKLINE_DAYS:]),
+            "recent_dates": list(dates_idx[-SPARKLINE_DAYS:]), "recent_lows": lows[-SPARKLINE_DAYS:],
         })
 
     rows.sort(key=lambda r: (-r["score"], -r["depth_pct"]))
@@ -307,8 +327,13 @@ def _detail_chart_svg(r):
     없어서 그 대신 "다리 시작일"과 "터치(오늘, 저울점수/등급/깊이)"만 표시한다."""
     dates = r["recent_dates"][-DETAIL_CHART_DAYS:]
     closes = r["recent_closes"][-DETAIL_CHART_DAYS:]
+    lows = r.get("recent_lows", closes)[-DETAIL_CHART_DAYS:]
     if len(closes) < 2:
         return "<div>데이터 부족</div>"
+
+    # 2026-09-04 사용자 요청("과거에도 터치가 일어났었지?" -> "해줘") -- 이 창 안에서 오늘(마지막
+    # 점) 이전에 있었던 다른 터치들도 같이 표시. 마지막 점은 이미 별도 원형 마커로 표시되므로 제외.
+    past_touch_idxs = {idx for idx, _ in _historical_touch_points(closes, lows) if idx < len(closes) - 1}
 
     w, h = 1000, 420
     pad_x, top_pad, bottom_pad = 40, 110, 95
@@ -359,6 +384,10 @@ def _detail_chart_svg(r):
             # 옮겼다 -- 겹칠 공간 자체가 없는 자리라 안전하다.
             dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="6" fill="none" stroke="{tier_color}" '
                          f'stroke-width="2.5"/>')
+        elif i in past_touch_idxs:
+            dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="5" fill="none" stroke="#c9860a" '
+                         f'stroke-width="2"/>')
+            dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3" fill="{pct_color}"/>')
         else:
             dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3" fill="{pct_color}"/>')
         labels.append(f'<text x="{x:.1f}" y="{y1:.1f}" font-size="12" fill="#5a5650" text-anchor="middle">'
@@ -379,7 +408,11 @@ def _detail_chart_svg(r):
                       f'<text x="{lx:.1f}" y="{top_pad - 45:.1f}" font-size="11" font-weight="700" '
                       f'fill="#5b3fa0" text-anchor="middle">다리 시작</text>')
 
-    return f'''<svg width="100%" viewBox="0 0 {w} {h}">
+    past_touch_note = (
+        '<div style="font-size:11px;color:#c9860a;margin-bottom:2px;">'
+        '○ 주황 테두리 = 이 구간 안의 과거 터치(오늘 것 말고도 이 종목은 반복적으로 터치가 일어남)'
+        '</div>') if past_touch_idxs else ""
+    return f'''{past_touch_note}<svg width="100%" viewBox="0 0 {w} {h}">
       {leg_marker}
       {"".join(segs)}
       {"".join(dots)}
