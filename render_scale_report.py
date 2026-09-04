@@ -345,22 +345,27 @@ def _detail_chart_svg(r):
         pct = ((c / closes[i - 1] - 1) * 100) if i > 0 else 0.0
         pct_color = "#0a8a3c" if pct >= 0 else "#c0392b"
         above = (i % 2 == 0)
-        ly = y - 14 if above else y + 22
-        dy2, dy3 = (13, 26) if above else (13, 26)
+        # 2026-09-04 사용자 지적("겹쳐 보임") -- 이전엔 above일 때도 아래쪽으로 줄이 파고들어
+        # 점을 가로질러 겹쳤다. 이제 위/아래 어느 쪽이든 3줄 블록이 점 반대편으로만 쌓이게 한다.
+        if above:
+            y1, y2, y3 = y - 36, y - 23, y - 10
+        else:
+            y1, y2, y3 = y + 16, y + 29, y + 42
         date_label = f"{d.month:02d}-{d.day:02d}"
         if is_last:
             dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="6" fill="none" stroke="{tier_color}" '
                          f'stroke-width="2.5"/>')
+            tier_y = (y1 - 15) if above else (y3 + 15)
             labels.append(
-                f'<text x="{x:.1f}" y="{ly:.1f}" font-size="12" font-weight="700" fill="{tier_color}" '
+                f'<text x="{x:.1f}" y="{tier_y:.1f}" font-size="12" font-weight="700" fill="{tier_color}" '
                 f'text-anchor="end">터치 {tier}{r["score"]:+d} · 깊이{r["depth_pct"]:.1f}%p</text>')
         else:
             dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3" fill="{pct_color}"/>')
-        labels.append(f'<text x="{x:.1f}" y="{ly:.1f}" font-size="12" fill="#5a5650" text-anchor="middle">'
+        labels.append(f'<text x="{x:.1f}" y="{y1:.1f}" font-size="12" fill="#5a5650" text-anchor="middle">'
                        f'{date_label}</text>')
-        labels.append(f'<text x="{x:.1f}" y="{ly + dy2:.1f}" font-size="12" fill="#1c1d1f" '
+        labels.append(f'<text x="{x:.1f}" y="{y2:.1f}" font-size="12" fill="#1c1d1f" '
                        f'text-anchor="middle">{c:,.0f}</text>')
-        labels.append(f'<text x="{x:.1f}" y="{ly + dy3:.1f}" font-size="12" fill="{pct_color}" '
+        labels.append(f'<text x="{x:.1f}" y="{y3:.1f}" font-size="12" fill="{pct_color}" '
                        f'text-anchor="middle">{pct:+.1f}%</text>')
 
     leg_marker = ""
@@ -494,7 +499,7 @@ def render_html(top_rows, total_candidates):
   .zz-lightbox:target {{ display:grid; place-items:center; }}
   .zz-lightbox-backdrop {{ position:absolute; inset:0; background:rgba(20,20,18,0.75); }}
   .zz-lightbox-panel {{ position:relative; background:#fff; border-radius:12px; padding:20px 28px 24px;
-                         width:96vw; max-width:1500px; max-height:92vh; overflow:auto;
+                         width:91vw; max-width:1425px; max-height:92vh; overflow:auto;
                          box-shadow:0 8px 40px rgba(0,0,0,0.35); }}
   .zz-lightbox-title {{ font-size:14px; font-weight:700; margin-bottom:10px; padding-right:24px; }}
   .zz-lightbox-close {{ position:absolute; top:10px; right:14px; font-size:20px; line-height:1;
