@@ -33,6 +33,9 @@ UNIVERSE_PATH_CANDIDATES = [
 ]
 TOP_N = 20  # 2026-09-04 사용자 요청("추천 종목 20개로 확장") -- 기존 15개에서 확대
 SPARKLINE_DAYS = 40  # 종목별 최근 가격 흐름 미니 그래프용
+DETAIL_CHART_DAYS = 25  # 2026-09-04 사용자 요청("그래프를 클릭하면 확대") -- 라벨(날짜/가격/등락%)이
+# 겹치지 않도록 미니 스파크라인(40일)보다 짧게 잡는다. V3 ZZ 화면의 확대차트(recent_two_legs_svg)
+# 참고 -- 저울은 band/부스터 라벨 체계가 없어(DEPTH_BANDS 미보유) "다리"/"터치+등급"만 표시.
 
 
 def _resolve_path(candidates, label):
@@ -211,9 +214,11 @@ def build_report():
         rows.append({
             "name": name, "code": name_to_code.get(name, "-"), "score": score,
             "leg_dir": pos["leg_dir"], "leg_pct": pos["leg_pct"],
-            "leg_days": pos["leg_days"], "depth_pct": depth_pct, "cur_price": entry_price,
+            "leg_days": pos["leg_days"], "leg_start_date": pos["leg_start_date"],
+            "depth_pct": depth_pct, "cur_price": entry_price,
             "yr_pos": yr_pos, "risk_flag": risk_flag, "vr": vr, "fast_rev": fast_rev,
             "last_date": dates_idx[-1], "recent_closes": closes[-SPARKLINE_DAYS:],
+            "recent_dates": list(dates_idx[-SPARKLINE_DAYS:]),
         })
 
     rows.sort(key=lambda r: (-r["score"], -r["depth_pct"]))
@@ -295,6 +300,99 @@ def _sparkline_svg(closes):
     </svg>'''
 
 
+def _detail_chart_svg(r):
+    """2026-09-04 사용자 요청("그래프를 클릭하면 [V3 ZZ 확대차트 스크린샷]처럼 나왔으면") --
+    미니 스파크라인을 클릭하면 열리는 확대 차트. V3 ZZ의 recent_two_legs_svg와 같은 정신(날짜+
+    가격+등락% 라벨을 점마다 교대로 위/아래 배치)이되, 저울은 DEPTH_BANDS(등급별 문구) 체계가
+    없어서 그 대신 "다리 시작일"과 "터치(오늘, 저울점수/등급/깊이)"만 표시한다."""
+    dates = r["recent_dates"][-DETAIL_CHART_DAYS:]
+    closes = r["recent_closes"][-DETAIL_CHART_DAYS:]
+    if len(closes) < 2:
+        return "<div>데이터 부족</div>"
+
+    w, h = 900, 380
+    pad_x, top_pad, bottom_pad = 40, 90, 90
+    lo, hi = min(closes), max(closes)
+    span = (hi - lo) or 1.0
+    plot_h = h - top_pad - bottom_pad
+    step = (w - 2 * pad_x) / (len(closes) - 1)
+
+    xs, ys = [], []
+    for i, c in enumerate(closes):
+        xs.append(pad_x + i * step)
+        ys.append(top_pad + (1 - (c - lo) / span) * plot_h)
+
+    leg_start_date = r.get("leg_start_date")
+    leg_start_idx = None
+    for i, d in enumerate(dates):
+        if leg_start_date is not None and d == leg_start_date:
+            leg_start_idx = i
+            break
+
+    tier = _tier_of(r["score"])
+    tier_color, _ = TIER_COLOR[tier]
+
+    segs = []
+    for i in range(1, len(closes)):
+        seg_color = "#0a8a3c" if closes[i] >= closes[i - 1] else "#c0392b"
+        segs.append(f'<line x1="{xs[i-1]:.1f}" y1="{ys[i-1]:.1f}" x2="{xs[i]:.1f}" y2="{ys[i]:.1f}" '
+                     f'stroke="{seg_color}" stroke-width="2"/>')
+
+    labels = []
+    dots = []
+    for i, (x, y, c, d) in enumerate(zip(xs, ys, closes, dates)):
+        is_last = i == len(closes) - 1
+        pct = ((c / closes[i - 1] - 1) * 100) if i > 0 else 0.0
+        pct_color = "#0a8a3c" if pct >= 0 else "#c0392b"
+        above = (i % 2 == 0)
+        ly = y - 14 if above else y + 22
+        dy2, dy3 = (13, 26) if above else (13, 26)
+        date_label = f"{d.month:02d}-{d.day:02d}"
+        if is_last:
+            dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="6" fill="none" stroke="{tier_color}" '
+                         f'stroke-width="2.5"/>')
+            labels.append(
+                f'<text x="{x:.1f}" y="{ly:.1f}" font-size="12" font-weight="700" fill="{tier_color}" '
+                f'text-anchor="end">터치 {tier}{r["score"]:+d} · 깊이{r["depth_pct"]:.1f}%p</text>')
+        else:
+            dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3" fill="{pct_color}"/>')
+        labels.append(f'<text x="{x:.1f}" y="{ly:.1f}" font-size="10.5" fill="#5a5650" text-anchor="middle">'
+                       f'{date_label}</text>')
+        labels.append(f'<text x="{x:.1f}" y="{ly + dy2:.1f}" font-size="10.5" fill="#1c1d1f" '
+                       f'text-anchor="middle">{c:,.0f}</text>')
+        labels.append(f'<text x="{x:.1f}" y="{ly + dy3:.1f}" font-size="10.5" fill="{pct_color}" '
+                       f'text-anchor="middle">{pct:+.1f}%</text>')
+
+    leg_marker = ""
+    if leg_start_idx is not None:
+        lx = xs[leg_start_idx]
+        leg_marker = (f'<line x1="{lx:.1f}" y1="{top_pad - 6:.1f}" x2="{lx:.1f}" y2="{h - bottom_pad + 6:.1f}" '
+                      f'stroke="#5b3fa0" stroke-width="1" stroke-dasharray="3,3"/>'
+                      f'<text x="{lx:.1f}" y="{top_pad - 12:.1f}" font-size="11" font-weight="700" '
+                      f'fill="#5b3fa0" text-anchor="middle">다리 시작</text>')
+
+    return f'''<svg width="100%" viewBox="0 0 {w} {h}" style="max-width:{w}px;">
+      {leg_marker}
+      {"".join(segs)}
+      {"".join(dots)}
+      {"".join(labels)}
+    </svg>'''
+
+
+def _chart_lightbox_html(anchor_id, title, big_svg):
+    """V3 ZZ 대시보드의 확대차트 라이트박스(jobs.render_holding_zigzags._chart_lightbox_html)와
+    같은 방식 -- JS 없이 CSS :target만으로 여닫힘(href로 이 id를 가리키면 열리고, 배경/✕ 클릭시
+    href="#"로 닫힘)."""
+    return f'''<div id="{anchor_id}" class="zz-lightbox">
+      <a href="#" class="zz-lightbox-backdrop" aria-label="닫기"></a>
+      <div class="zz-lightbox-panel">
+        <a href="#" class="zz-lightbox-close" aria-label="닫기">✕</a>
+        <div class="zz-lightbox-title">{title}</div>
+        {big_svg}
+      </div>
+    </div>'''
+
+
 def render_html(top_rows, total_candidates):
     """2026-09-04 사용자 요청("사이트를 만들어서 거기서 볼 수 있게") -- GitHub Pages로 배포할
     정적 HTML. V3/콜라 대시보드 계열과 같은 톤(단순 표+색 배지)으로 통일, 별도 프레임워크 없이
@@ -302,10 +400,14 @@ def render_html(top_rows, total_candidates):
     base_date = top_rows[0]["last_date"].date() if top_rows else "-"
     strong_count = sum(1 for r in top_rows if r["score"] >= 2)
     rows_html = []
+    lightboxes_html = []
     for i, r in enumerate(top_rows, 1):
         tier = _tier_of(r["score"])
         color, bg = TIER_COLOR[tier]
         yr_pos_html = f"{r['yr_pos']:.0f}%" if r["yr_pos"] is not None else "-"
+        chart_id = f"chart-{r['code']}"
+        lightboxes_html.append(_chart_lightbox_html(
+            chart_id, f"{r['name']}({r['code']}) · 최근 구간", _detail_chart_svg(r)))
         rows_html.append(f'''<tr>
       <td>{i}</td>
       <td style="font-weight:700;">{r['name']}</td>
@@ -313,7 +415,8 @@ def render_html(top_rows, total_candidates):
       <td><span style="color:{color};background:{bg};border-radius:6px;padding:2px 8px;font-weight:700;">
           {r['score']:+d} {tier}</span></td>
       <td>{_seesaw_svg(r['score'])}</td>
-      <td>{_sparkline_svg(r.get('recent_closes') or [])}</td>
+      <td><a href="#{chart_id}" class="zz-chart-link" title="클릭하면 확대">
+          {_sparkline_svg(r.get('recent_closes') or [])}</a></td>
       <td>하락다리 {r['leg_days']}일째</td>
       <td style="color:{'#0a8a3c' if r['leg_pct'] >= 0 else '#c0392b'};">{r['leg_pct']:+.1f}%</td>
       <td>{r['depth_pct']:.1f}%p</td>
@@ -336,6 +439,17 @@ def render_html(top_rows, total_candidates):
        white-space: nowrap; }}
   td {{ border-bottom: 1px solid #e5e3dc; padding: 8px 6px; vertical-align: middle; }}
   .note {{ margin-top: 20px; font-size: 12.5px; color:#898781; line-height:1.6; }}
+  .zz-chart-link {{ display:inline-block; cursor:zoom-in; border-radius:6px; }}
+  .zz-chart-link:hover {{ outline:2px solid #cfe0f5; }}
+  .zz-lightbox {{ display:none; position:fixed; inset:0; z-index:1000; }}
+  .zz-lightbox:target {{ display:grid; place-items:center; }}
+  .zz-lightbox-backdrop {{ position:absolute; inset:0; background:rgba(20,20,18,0.75); }}
+  .zz-lightbox-panel {{ position:relative; background:#fff; border-radius:12px; padding:20px 28px 24px;
+                         max-width:94vw; max-height:90vh; overflow:auto; box-shadow:0 8px 40px rgba(0,0,0,0.35); }}
+  .zz-lightbox-title {{ font-size:14px; font-weight:700; margin-bottom:10px; padding-right:24px; }}
+  .zz-lightbox-close {{ position:absolute; top:10px; right:14px; font-size:20px; line-height:1;
+                         color:#898781; text-decoration:none; }}
+  .zz-lightbox-close:hover {{ color:#1c1d1f; }}
 </style>
 </head><body>
   <h1>⚖ 저울 -- 코스피+코스닥 상위 {len(top_rows)}</h1>
@@ -354,6 +468,7 @@ def render_html(top_rows, total_candidates):
     평균이 오히려 마이너스였습니다. 매일 17:10(KST) 자동 갱신됩니다.
     <br>공식 검증 근거: <a href="https://github.com/riskmgr12345-beop/scale-project">scale-project 저장소</a>
   </div>
+  {"".join(lightboxes_html)}
 </body></html>'''
 
 
