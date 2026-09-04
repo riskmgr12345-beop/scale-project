@@ -13,6 +13,22 @@
        white-space: nowrap; }
   td { border-bottom: 1px solid #e5e3dc; padding: 8px 6px; vertical-align: middle; }
   .note { margin-top: 20px; font-size: 12.5px; color:#898781; line-height:1.6; }
+  .strong-box { border:2px solid #0a8a3c; background:#e8f5eb; border-radius:12px;
+                  padding:14px 16px 16px; margin-bottom:20px; }
+  .strong-box-empty { padding:14px 16px; font-size:13px; color:#5a6b5e; }
+  .strong-box-title { font-size:14px; font-weight:700; color:#0a5c29; margin-bottom:10px;
+                        display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+  .strong-box-stat { font-size:12px; font-weight:600; color:#3d7a52; }
+  .strong-box-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+                       gap:8px; }
+  .strong-item { display:block; background:#fff; border:1px solid #bfe3cb; border-radius:8px;
+                   padding:8px 10px; text-decoration:none; color:#1c1d1f; cursor:zoom-in; }
+  .strong-item:hover { border-color:#0a8a3c; box-shadow:0 2px 8px rgba(10,138,60,0.15); }
+  .strong-item-top { display:flex; align-items:center; gap:6px; font-size:13.5px; }
+  .strong-item-name { font-weight:700; }
+  .strong-item-code { color:#898781; font-size:11.5px; font-variant-numeric:tabular-nums; }
+  .strong-item-score { margin-left:auto; color:#0a8a3c; font-weight:700; font-variant-numeric:tabular-nums; }
+  .strong-item-sub { display:block; margin-top:3px; font-size:11.5px; color:#5a6b5e; }
   .zz-chart-link { display:inline-block; cursor:zoom-in; border-radius:6px; }
   .zz-chart-link:hover { outline:2px solid #cfe0f5; }
   .zz-lightbox { display:none; position:fixed; inset:0; z-index:1000; }
@@ -30,6 +46,152 @@
   <h1>⚖ 저울 -- 코스피+코스닥 상위 20</h1>
   <div class="sub">기준일 2026-09-03 · 하락다리(반등기대) 후보 1712종목 중 상위 20 ·
     강한이김(≥2점) 20개</div>
+  <div class="strong-box">
+      <div class="strong-box-title">🟢 강한이김(저울점수 ≥2점) -- 실측상 신뢰 가능한 신호
+        <span class="strong-box-stat">5일 도달률 72.8% · 평균 +0.49% (2,700종목/n=77,750 검증)</span>
+      </div>
+      <div class="strong-box-grid"><a href="#chart-338220" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">뷰노</span>
+            <span class="strong-item-code">338220</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 39.7%p · 하락다리 2일째 · 5,220원</span>
+        </a><a href="#chart-251370" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">와이엠티</span>
+            <span class="strong-item-code">251370</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 19.4%p · 하락다리 2일째 · 6,730원</span>
+        </a><a href="#chart-314930" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">바이오다인</span>
+            <span class="strong-item-code">314930</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 19.3%p · 하락다리 1일째 · 7,040원</span>
+        </a><a href="#chart-265740" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">엔에프씨</span>
+            <span class="strong-item-code">265740</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 16.9%p · 하락다리 1일째 · 6,860원</span>
+        </a><a href="#chart-330350" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">위더스제약</span>
+            <span class="strong-item-code">330350</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 15.5%p · 하락다리 1일째 · 7,030원</span>
+        </a><a href="#chart-019680" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">대교</span>
+            <span class="strong-item-code">019680</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 13.8%p · 하락다리 1일째 · 1,000원</span>
+        </a><a href="#chart-070960" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">모나용평</span>
+            <span class="strong-item-code">070960</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 12.7%p · 하락다리 3일째 · 1,994원</span>
+        </a><a href="#chart-086710" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">선진뷰티사이언스</span>
+            <span class="strong-item-code">086710</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 12.6%p · 하락다리 2일째 · 7,210원</span>
+        </a><a href="#chart-003280" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">흥아해운</span>
+            <span class="strong-item-code">003280</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 12.6%p · 하락다리 1일째 · 1,699원</span>
+        </a><a href="#chart-323990" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">박셀바이오</span>
+            <span class="strong-item-code">323990</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 12.3%p · 하락다리 2일째 · 4,490원</span>
+        </a><a href="#chart-069620" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">대웅제약</span>
+            <span class="strong-item-code">069620</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 11.8%p · 하락다리 3일째 · 114,800원</span>
+        </a><a href="#chart-003620" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">KG모빌리티</span>
+            <span class="strong-item-code">003620</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 11.6%p · 하락다리 3일째 · 2,655원</span>
+        </a><a href="#chart-090460" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">비에이치</span>
+            <span class="strong-item-code">090460</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 11.3%p · 하락다리 1일째 · 19,730원</span>
+        </a><a href="#chart-032800" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">판타지오</span>
+            <span class="strong-item-code">032800</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 10.9%p · 하락다리 1일째 · 1,487원</span>
+        </a><a href="#chart-003570" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">SNT다이내믹스</span>
+            <span class="strong-item-code">003570</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 10.4%p · 하락다리 2일째 · 28,450원</span>
+        </a><a href="#chart-010770" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">평화홀딩스</span>
+            <span class="strong-item-code">010770</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 10.2%p · 하락다리 1일째 · 3,515원</span>
+        </a><a href="#chart-006490" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">프리티</span>
+            <span class="strong-item-code">006490</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 10.0%p · 하락다리 1일째 · 898원</span>
+        </a><a href="#chart-418420" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">라온텍</span>
+            <span class="strong-item-code">418420</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 10.0%p · 하락다리 2일째 · 4,020원</span>
+        </a><a href="#chart-462510" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">라메디텍</span>
+            <span class="strong-item-code">462510</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 9.8%p · 하락다리 5일째 · 2,610원</span>
+        </a><a href="#chart-432470" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">케이엔에스</span>
+            <span class="strong-item-code">432470</span>
+            <span class="strong-item-score">+4</span>
+          </span>
+          <span class="strong-item-sub">되돌림 9.4%p · 하락다리 1일째 · 9,980원</span>
+        </a></div>
+    </div>
   <div class="table-scroll">
   <table>
     <tr><th>#</th><th>종목명</th><th>코드</th><th>저울점수</th><th>시소</th><th>최근흐름</th>

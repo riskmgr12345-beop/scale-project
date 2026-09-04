@@ -508,7 +508,8 @@ def render_html(top_rows, total_candidates):
     정적 HTML. V3/콜라 대시보드 계열과 같은 톤(단순 표+색 배지)으로 통일, 별도 프레임워크 없이
     자체완결형 파일 하나."""
     base_date = top_rows[0]["last_date"].date() if top_rows else "-"
-    strong_count = sum(1 for r in top_rows if r["score"] >= 2)
+    strong_rows = [r for r in top_rows if r["score"] >= 2]
+    strong_count = len(strong_rows)
     rows_html = []
     lightboxes_html = []
     for i, r in enumerate(top_rows, 1):
@@ -538,6 +539,32 @@ def render_html(top_rows, total_candidates):
       <td style="text-align:right;">{r['cur_price']:,.0f}</td>
     </tr>''')
 
+    # 2026-09-04 사용자 요청("≥2점 인종목 해당하는 종목을 상위에 박스를 치고 박스안에 넣어줘")
+    # -- 이미 정렬(-score, -depth_pct)상 강한이김이 표 맨 위에 오긴 하지만, 사용자가 원한 건
+    # "확정률 신뢰 가능"으로 구분된 신호를 표와 별개로 눈에 띄게 박스로 뽑아 페이지 최상단에
+    # 두는 것 -- 72.8%/+0.49%(실측)가 적용되는 종목만 한눈에 보이게.
+    strong_items_html = []
+    for r in strong_rows:
+        color, bg = TIER_COLOR["강한이김"]
+        chart_id = f"chart-{r['code']}"
+        strong_items_html.append(f'''<a href="#{chart_id}" class="strong-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">{r['name']}</span>
+            <span class="strong-item-code">{r['code']}</span>
+            <span class="strong-item-score">{r['score']:+d}</span>
+          </span>
+          <span class="strong-item-sub">되돌림 {r['depth_pct']:.1f}%p · 하락다리 {r['leg_days']}일째 · {r['cur_price']:,.0f}원</span>
+        </a>''')
+    strong_box_html = f'''<div class="strong-box">
+      <div class="strong-box-title">🟢 강한이김(저울점수 ≥2점) -- 실측상 신뢰 가능한 신호
+        <span class="strong-box-stat">5일 도달률 72.8% · 평균 +0.49% (2,700종목/n=77,750 검증)</span>
+      </div>
+      <div class="strong-box-grid">{"".join(strong_items_html)}</div>
+    </div>''' if strong_rows else (
+        '<div class="strong-box strong-box-empty">🟢 강한이김(≥2점) 신호 -- 오늘은 해당 종목 없음'
+        '</div>'
+    )
+
     return f'''<!doctype html>
 <html lang="ko"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -553,6 +580,22 @@ def render_html(top_rows, total_candidates):
        white-space: nowrap; }}
   td {{ border-bottom: 1px solid #e5e3dc; padding: 8px 6px; vertical-align: middle; }}
   .note {{ margin-top: 20px; font-size: 12.5px; color:#898781; line-height:1.6; }}
+  .strong-box {{ border:2px solid #0a8a3c; background:#e8f5eb; border-radius:12px;
+                  padding:14px 16px 16px; margin-bottom:20px; }}
+  .strong-box-empty {{ padding:14px 16px; font-size:13px; color:#5a6b5e; }}
+  .strong-box-title {{ font-size:14px; font-weight:700; color:#0a5c29; margin-bottom:10px;
+                        display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }}
+  .strong-box-stat {{ font-size:12px; font-weight:600; color:#3d7a52; }}
+  .strong-box-grid {{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+                       gap:8px; }}
+  .strong-item {{ display:block; background:#fff; border:1px solid #bfe3cb; border-radius:8px;
+                   padding:8px 10px; text-decoration:none; color:#1c1d1f; cursor:zoom-in; }}
+  .strong-item:hover {{ border-color:#0a8a3c; box-shadow:0 2px 8px rgba(10,138,60,0.15); }}
+  .strong-item-top {{ display:flex; align-items:center; gap:6px; font-size:13.5px; }}
+  .strong-item-name {{ font-weight:700; }}
+  .strong-item-code {{ color:#898781; font-size:11.5px; font-variant-numeric:tabular-nums; }}
+  .strong-item-score {{ margin-left:auto; color:#0a8a3c; font-weight:700; font-variant-numeric:tabular-nums; }}
+  .strong-item-sub {{ display:block; margin-top:3px; font-size:11.5px; color:#5a6b5e; }}
   .zz-chart-link {{ display:inline-block; cursor:zoom-in; border-radius:6px; }}
   .zz-chart-link:hover {{ outline:2px solid #cfe0f5; }}
   .zz-lightbox {{ display:none; position:fixed; inset:0; z-index:1000; }}
@@ -570,6 +613,7 @@ def render_html(top_rows, total_candidates):
   <h1>⚖ 저울 -- 코스피+코스닥 상위 {len(top_rows)}</h1>
   <div class="sub">기준일 {base_date} · 하락다리(반등기대) 후보 {total_candidates}종목 중 상위 {len(top_rows)} ·
     강한이김(≥2점) {strong_count}개</div>
+  {strong_box_html}
   <div class="table-scroll">
   <table>
     <tr><th>#</th><th>종목명</th><th>코드</th><th>저울점수</th><th>시소</th><th>최근흐름</th>
