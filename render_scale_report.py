@@ -237,6 +237,26 @@ def _drop_zero_volume_days(closes, highs, lows, volumes, dates):
             [volumes[i] for i in keep], [dates[i] for i in keep])
 
 
+HALT_MIN_TRAILING_ZERO_DAYS = 3
+
+
+def _trailing_zero_volume_run(volumes):
+    """2026-09-04 사용자 발견(대교 -- 실시간 화면에서 거래량0/매도호가0/매수호가0인데도 저울
+    상위 20개·강한이김 박스에 들어가 있었음) -- 원인 진단: 캐시를 보니 대교는 08-13(마지막
+    정상거래) 이후 08-14~09-02까지 15거래일 연속 O=H=L=C=1,000·거래량0(엑사이엔씨처럼 하루짜리
+    가짜값이 아니라 진짜 장기 거래정지로 보임, 다른 정상 종목은 09-03까지 데이터가 있는데
+    대교는 09-02에서 끊김). `_drop_zero_volume_days`가 이 정지일들을 지우면 "마지막 남은 날"이
+    자동으로 08-13이 되면서 그게 마치 오늘의 살아있는 신호처럼 보고서에 나왔다 -- 거래 자체가
+    불가능한 종목을 추천에 넣은 셈. 원본(필터링 전) 시계열 끝에서부터 거래량0이 몇 거래일
+    연속됐는지 세서, 그 종목이 "지금도 정지 중"인지 판별하는 데 쓴다."""
+    run = 0
+    for v in reversed(volumes):
+        if v and v > 0:
+            break
+        run += 1
+    return run
+
+
 def build_report():
     with open(_resolve_cache_path(), "rb") as f:
         cache = pickle.load(f)
@@ -252,6 +272,8 @@ def build_report():
             dates_idx = list(df.index)
         except Exception:
             continue
+        if _trailing_zero_volume_run(volumes) >= HALT_MIN_TRAILING_ZERO_DAYS:
+            continue  # 현재 거래정지 추정 -- 실제로 사고팔 수 없는 종목은 아예 후보에서 제외
         closes, highs, lows, volumes, dates_idx = _drop_zero_volume_days(
             closes, highs, lows, volumes, dates_idx)
         if len(closes) < 60:
