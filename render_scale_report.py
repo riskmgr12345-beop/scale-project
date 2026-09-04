@@ -11,10 +11,32 @@
 여부 -- 이 캐시엔 OHLCV만 있고 재무/투자자 데이터가 없어서, V3의 "객관가치" 배지처럼 전부
 넣으려면 별도 데이터소스(DART, KRX 관리종목 리스트 등)를 새로 연결해야 한다.
 """
+import json
 import os
 import pickle
 import statistics
 from datetime import datetime
+
+# 2026-09-04 사용자 요청("①번 시장국면 배지부터 화면에 반영") -- regime_filter_test.py로
+# 검증된 실측치(강한이김>=2 기준, 시기분할 재현 확인). build_kospi_regime_cache.py(GHA로
+# 매일 17:00 KST 갱신)가 만든 캐시에서 오늘 국면만 읽어와 이 표로 매칭한다.
+REGIME_STATS = {
+    "up": {"label": "상승장(코스피 60일선 위)", "reach": 69.7, "d5": -0.26,
+           "verdict": "더 약한 국면"},
+    "down": {"label": "하락장(코스피 60일선 아래)", "reach": 79.3, "d5": 2.06,
+             "verdict": "더 좋은 국면"},
+}
+REGIME_CACHE_PATH = "research_cache/kospi_regime_cache.json"
+
+
+def _load_kospi_regime():
+    """캐시가 없거나(GHA 첫 실행 전) 오래됐어도 리포트 생성 자체는 죽지 않게 None을 돌려준다
+    -- render_html이 "국면 데이터 없음"으로 정직하게 표시."""
+    try:
+        with open(REGIME_CACHE_PATH, encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
 
 THRESHOLD = 0.03
 MIN_DEPTH = 2.0  # 상위 15개를 뽑는 용도라 문턱을 낮게 잡아 후보군을 넓게 본다(2%p+)
@@ -503,11 +525,30 @@ def _chart_lightbox_html(anchor_id, title, big_svg):
     </div>'''
 
 
+def _regime_badge_html(regime_data):
+    """2026-09-04 사용자 요청 -- 오늘 코스피 국면과, regime_filter_test.py로 검증된 그 국면의
+    강한이김(>=2) 실측 성과를 배지로 보여준다. 국면 자체는 캐시 없이 판단 못하는 정보라(개별
+    종목 OHLCV로는 못 만듦), 캐시가 비어 있으면 정직하게 "데이터 없음"으로 표시한다."""
+    if not regime_data or regime_data.get("regime") not in REGIME_STATS:
+        return ('<div class="regime-badge regime-unknown">'
+                '📊 시장국면 데이터 없음 (캐시 갱신 전 -- 다음 GHA 실행 후 표시됩니다)</div>')
+    regime = regime_data["regime"]
+    stat = REGIME_STATS[regime]
+    icon = "📉" if regime == "down" else "📈"
+    return f'''<div class="regime-badge regime-{regime}">
+      {icon} 오늘({regime_data.get("date", "-")}) 시장국면: <b>{stat["label"]}</b> --
+      강한이김(≥2점) 신호가 <b>{stat["verdict"]}</b>
+      (5일도달률 {stat["reach"]:.1f}% · 평균 {stat["d5"]:+.2f}%, 코스피 {regime_data.get("kospi_close", 0):,.1f}
+      / 60일선 {regime_data.get("kospi_ma60", 0):,.1f})
+    </div>'''
+
+
 def render_html(top_rows, total_candidates):
     """2026-09-04 사용자 요청("사이트를 만들어서 거기서 볼 수 있게") -- GitHub Pages로 배포할
     정적 HTML. V3/콜라 대시보드 계열과 같은 톤(단순 표+색 배지)으로 통일, 별도 프레임워크 없이
     자체완결형 파일 하나."""
     base_date = top_rows[0]["last_date"].date() if top_rows else "-"
+    regime_html = _regime_badge_html(_load_kospi_regime())
     strong_rows = [r for r in top_rows if r["score"] >= 2]
     strong_count = len(strong_rows)
     rows_html = []
@@ -596,6 +637,11 @@ def render_html(top_rows, total_candidates):
   .strong-item-code {{ color:#898781; font-size:11.5px; font-variant-numeric:tabular-nums; }}
   .strong-item-score {{ margin-left:auto; color:#0a8a3c; font-weight:700; font-variant-numeric:tabular-nums; }}
   .strong-item-sub {{ display:block; margin-top:3px; font-size:11.5px; color:#5a6b5e; }}
+  .regime-badge {{ border-radius:8px; padding:9px 14px; margin-bottom:14px; font-size:12.5px;
+                    line-height:1.5; }}
+  .regime-down {{ background:#e8f5eb; color:#0a5c29; border:1px solid #bfe3cb; }}
+  .regime-up {{ background:#fbf3d8; color:#7b6b1a; border:1px solid #ecdca0; }}
+  .regime-unknown {{ background:#f0efe9; color:#70706a; border:1px solid #e5e3dc; }}
   .zz-chart-link {{ display:inline-block; cursor:zoom-in; border-radius:6px; }}
   .zz-chart-link:hover {{ outline:2px solid #cfe0f5; }}
   .zz-lightbox {{ display:none; position:fixed; inset:0; z-index:1000; }}
@@ -613,6 +659,7 @@ def render_html(top_rows, total_candidates):
   <h1>⚖ 저울 -- 코스피+코스닥 상위 {len(top_rows)}</h1>
   <div class="sub">기준일 {base_date} · 하락다리(반등기대) 후보 {total_candidates}종목 중 상위 {len(top_rows)} ·
     강한이김(≥2점) {strong_count}개</div>
+  {regime_html}
   {strong_box_html}
   <div class="table-scroll">
   <table>

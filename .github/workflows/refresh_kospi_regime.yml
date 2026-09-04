@@ -1,0 +1,40 @@
+name: 코스피 시장국면 캐시 갱신
+
+# 2026-09-04 사용자 요청("①번 시장국면 배지부터 화면에 반영") -- 코스피 60일선 국면(상승/
+# 하락)에 따라 강한이김(>=2) 신호 성과가 크게 갈린다는 걸 regime_filter_test.py로 검증
+# 완료(상승장 69.7%/-0.26% vs 하락장 79.3%/+2.06%, 시기분할 재현됨). render_scale_report.py가
+# 매번 이 값을 직접 조회하면 클라우드 라우틴(저울 프로젝트 일일 리포트) 샌드박스에서
+# 네트워크가 막혀 실패하므로(ZZ/콜라 캐시와 동일한 이유), 여기서 매일 미리 조회해 작은 JSON
+# 캐시로 커밋해두고 리포트는 그 캐시만 읽는다. 매일 17:00 KST(=08:00 UTC)에 실행 --
+# 저울 리포트 라우틴(17:10 KST)보다 10분 먼저 끝나도록.
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install -r requirements.txt
+
+      - name: 코스피 국면 캐시 재생성
+        run: python build_kospi_regime_cache.py
+
+      - name: 캐시 변경사항 커밋
+        run: |
+          git config user.name "scale-project-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add research_cache/kospi_regime_cache.json
+          git diff --cached --quiet || git commit -m "자동: 코스피 시장국면 캐시 갱신 $(date -u +%Y-%m-%d)"
+          git push
