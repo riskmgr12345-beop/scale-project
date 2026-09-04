@@ -142,10 +142,17 @@ def current_position(dates_idx, closes):
 
 
 def touch_depth_now(closes, lows, pos):
-    """진행 중인 다리에서 극값 대비 최신 종가의 되돌림 깊이(%p). down이면 저점 대비 반등폭,
-    up이면 고점 대비 눌림폭 -- DEPTH_BANDS 방향 정의와 동일."""
+    """진행 중인 다리에서 고점(leg_start_price) 대비 오늘 저가의 되돌림 깊이(%p).
+    2026-09-04 사용자 발견("1번과 4번, 2번과 3번 터치 격이 다른가?") -- 원래 여기가
+    (closes[-1]/lows[-1]-1)*100(오늘 종가가 오늘 저가 대비 얼마나 반등했는지)로 잘못 짜여
+    있었다. 이건 scale_validation_test.py/find_touch_entries가 실제 검증한 정의
+    ((peak-low)/peak*100, 다리 고점 대비 그날 저가 되돌림)와 다른 공식이라, 상위 20개
+    필터링·표시에 쓰인 depth_pct가 검증값과 안 맞는 진짜 버그였다. leg_start_price(=다리
+    시작 고점, current_position이 이미 계산해둠)를 기준으로 고쳐서 _historical_touch_points와
+    동일한 공식으로 통일한다."""
     if pos["leg_dir"] == "down":
-        return max(0.0, (closes[-1] / lows[-1] - 1) * 100) if lows[-1] else None
+        peak = pos["leg_start_price"]
+        return max(0.0, (peak - lows[-1]) / peak * 100) if peak else None
     return None  # 이번 버전은 하락다리(반등기대)만 다룬다 -- 저울 공식이 이 방향으로만 검증됨
 
 
