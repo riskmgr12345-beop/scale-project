@@ -414,7 +414,8 @@ def render_html(top_rows, total_candidates):
       <td style="color:#898781;font-variant-numeric:tabular-nums;">{r['code']}</td>
       <td><span style="color:{color};background:{bg};border-radius:6px;padding:2px 8px;font-weight:700;">
           {r['score']:+d} {tier}</span></td>
-      <td>{_seesaw_svg(r['score'])}</td>
+      <td><a href="#{chart_id}" class="zz-chart-link" title="클릭하면 확대">
+          {_seesaw_svg(r['score'])}</a></td>
       <td><a href="#{chart_id}" class="zz-chart-link" title="클릭하면 확대">
           {_sparkline_svg(r.get('recent_closes') or [])}</a></td>
       <td>하락다리 {r['leg_days']}일째</td>
