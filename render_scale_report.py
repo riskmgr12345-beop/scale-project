@@ -88,6 +88,14 @@ def _load_name_to_code():
 
 
 def zigzag_swings(closes, threshold=THRESHOLD):
+    """2026-09-04 사용자 발견("오늘 3% 다리가 생긴게 3개 맞지?" 확인 과정에서 라메디텍의
+    "다리 5일째 -4.0%" 표시가 실제(-9%대)와 다른 걸 발견) -- 진행 중인(아직 반전 미확정) 다리의
+    끝점(swings[-1])이, 예전엔 "-3% 문턱을 처음 넘긴 날"에 얼어붙어서 그 이후 더 깊어져도 화면에
+    반영이 안 됐다. V3의 진짜 프로덕션 지그재그(reporting/charts.py._zigzag_swings)와 대조해보니
+    거기는 루프가 끝난 뒤 마지막에 무조건 한 번 더 (extreme_idx, extreme_price)를 append해서
+    "지금까지의 최신 극값"을 항상 최신 상태로 유지하고 있었다 -- 이 저장소로 옮겨 적을 때 그
+    마지막 한 줄을 빠뜨린 게 원인. V3(실계좌)는 처음부터 이 버그가 없었음(별도 확인 완료).
+    아래 return 직전 append로 V3와 동일하게 맞춘다."""
     if len(closes) < 2:
         return []
     swings = [(0, closes[0])]
@@ -123,6 +131,8 @@ def zigzag_swings(closes, threshold=THRESHOLD):
                 direction = "up"
                 swings.append((i, c))
                 extreme_idx, extreme_price = i, c
+    if (extreme_idx, extreme_price) != swings[-1]:
+        swings.append((extreme_idx, extreme_price))
     return swings
 
 
