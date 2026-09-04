@@ -27,18 +27,38 @@ CACHE_PATH_CANDIDATES = [
     "../_상한가전조연구/research_cache/limitup_ohlcv_cache.pkl",
     "../limitup-precursor-research/research_cache/limitup_ohlcv_cache.pkl",
 ]
-TOP_N = 15
+UNIVERSE_PATH_CANDIDATES = [
+    "../_상한가전조연구/research_cache/universe_full.json",
+    "../limitup-precursor-research/research_cache/universe_full.json",
+]
+TOP_N = 20  # 2026-09-04 사용자 요청("추천 종목 20개로 확장") -- 기존 15개에서 확대
 
 
-def _resolve_cache_path():
-    for path in CACHE_PATH_CANDIDATES:
+def _resolve_path(candidates, label):
+    for path in candidates:
         if os.path.exists(path):
             return path
     raise FileNotFoundError(
-        "콜라 캐시(limitup_ohlcv_cache.pkl)를 찾을 수 없습니다. 시도한 경로: "
-        + ", ".join(CACHE_PATH_CANDIDATES)
+        f"{label}을(를) 찾을 수 없습니다. 시도한 경로: " + ", ".join(candidates)
         + " -- limitup-precursor-research 저장소가 이 저장소와 같은 부모 폴더에 클론돼 있는지 확인하세요."
     )
+
+
+def _resolve_cache_path():
+    return _resolve_path(CACHE_PATH_CANDIDATES, "콜라 캐시(limitup_ohlcv_cache.pkl)")
+
+
+def _load_name_to_code():
+    """2026-09-04 사용자 요청("각종목 코드번호 추가") -- 콜라 유니버스 목록(name/code/market)을
+    읽기전용 재사용해서 name->code 매핑을 만든다. 못 찾으면 빈 dict(코드 칸은 "-"로 표시)."""
+    import json
+    try:
+        path = _resolve_path(UNIVERSE_PATH_CANDIDATES, "콜라 유니버스 목록(universe_full.json)")
+    except FileNotFoundError:
+        return {}
+    with open(path, encoding="utf-8") as f:
+        universe = json.load(f)
+    return {item["name"]: item["code"] for item in universe if item.get("name") and item.get("code")}
 
 
 def zigzag_swings(closes, threshold=THRESHOLD):
@@ -153,6 +173,7 @@ def year_range_position_pct(closes, highs, lows):
 def build_report():
     with open(_resolve_cache_path(), "rb") as f:
         cache = pickle.load(f)
+    name_to_code = _load_name_to_code()
 
     rows = []
     for name, df in cache.items():
@@ -187,7 +208,8 @@ def build_report():
         yr_pos = year_range_position_pct(closes, highs, lows)
 
         rows.append({
-            "name": name, "score": score, "leg_dir": pos["leg_dir"], "leg_pct": pos["leg_pct"],
+            "name": name, "code": name_to_code.get(name, "-"), "score": score,
+            "leg_dir": pos["leg_dir"], "leg_pct": pos["leg_pct"],
             "leg_days": pos["leg_days"], "depth_pct": depth_pct, "cur_price": entry_price,
             "yr_pos": yr_pos, "risk_flag": risk_flag, "vr": vr, "fast_rev": fast_rev,
             "last_date": dates_idx[-1],
@@ -207,12 +229,11 @@ def render_text(top_rows, total_candidates):
     for i, r in enumerate(top_rows, 1):
         tier = "강한이김" if r["score"] >= 2 else ("약한이김" if r["score"] == 1 else
                                                   ("비김" if r["score"] == 0 else "짐"))
+        yr_pos_part = f" | 52주위치 {r['yr_pos']:.0f}%" if r["yr_pos"] is not None else ""
         lines.append(
-            f"{i}. {r['name']} | 저울점수 {r['score']:+d}({tier}) | "
-            f"하락다리 {r['leg_days']}일째, {r['leg_pct']:+.1f}% | 되돌림깊이 {r['depth_pct']:.1f}%p | "
-            f"52주위치 {r['yr_pos']:.0f}%" if r["yr_pos"] is not None else
-            f"{i}. {r['name']} | 저울점수 {r['score']:+d}({tier}) | "
+            f"{i}. {r['name']}({r['code']}) | 저울점수 {r['score']:+d}({tier}) | "
             f"하락다리 {r['leg_days']}일째, {r['leg_pct']:+.1f}% | 되돌림깊이 {r['depth_pct']:.1f}%p"
+            f"{yr_pos_part}"
         )
     return "\n".join(lines)
 
@@ -245,6 +266,7 @@ def render_html(top_rows, total_candidates):
         rows_html.append(f'''<tr>
       <td>{i}</td>
       <td style="font-weight:700;">{r['name']}</td>
+      <td style="color:#898781;font-variant-numeric:tabular-nums;">{r['code']}</td>
       <td><span style="color:{color};background:{bg};border-radius:6px;padding:2px 8px;font-weight:700;">
           {r['score']:+d} {tier}</span></td>
       <td>하락다리 {r['leg_days']}일째</td>
@@ -257,7 +279,7 @@ def render_html(top_rows, total_candidates):
     return f'''<!doctype html>
 <html lang="ko"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>저울 -- 코스피+코스닥 상위 15</title>
+<title>저울 -- 코스피+코스닥 상위 {len(top_rows)}</title>
 <style>
   body {{ font-family: -apple-system, "Malgun Gothic", sans-serif; background:#faf9f6; color:#1c1d1f;
          max-width: 900px; margin: 0 auto; padding: 24px 16px; }}
@@ -269,11 +291,11 @@ def render_html(top_rows, total_candidates):
   .note {{ margin-top: 20px; font-size: 12.5px; color:#898781; line-height:1.6; }}
 </style>
 </head><body>
-  <h1>⚖ 저울 -- 코스피+코스닥 상위 15</h1>
-  <div class="sub">기준일 {base_date} · 하락다리(반등기대) 후보 {total_candidates}종목 중 상위 15 ·
+  <h1>⚖ 저울 -- 코스피+코스닥 상위 {len(top_rows)}</h1>
+  <div class="sub">기준일 {base_date} · 하락다리(반등기대) 후보 {total_candidates}종목 중 상위 {len(top_rows)} ·
     강한이김(≥2점) {strong_count}개</div>
   <table>
-    <tr><th>#</th><th>종목명</th><th>저울점수</th><th>기간</th><th>다리등락%</th>
+    <tr><th>#</th><th>종목명</th><th>코드</th><th>저울점수</th><th>기간</th><th>다리등락%</th>
         <th>되돌림깊이</th><th>52주위치</th><th style="text-align:right;">현재가</th></tr>
     {"".join(rows_html)}
   </table>
