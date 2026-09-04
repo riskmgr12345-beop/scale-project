@@ -353,12 +353,12 @@ def _detail_chart_svg(r):
             y1, y2, y3 = y + 16, y + 29, y + 42
         date_label = f"{d.month:02d}-{d.day:02d}"
         if is_last:
+            # 2026-09-04 사용자 지적("겹쳐 보임") -- 여기 종목명 옆에 텍스트로 넣으면 근처 점들
+            # 라벨과(특히 다리가 짧아 마지막 며칠이 붙어있을 때) 겹치기 쉬워서, 점 마커만 강조
+            # 표시하고 등급 문구는 라이트박스 제목(팝업 상단, _chart_lightbox_html 호출부)으로
+            # 옮겼다 -- 겹칠 공간 자체가 없는 자리라 안전하다.
             dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="6" fill="none" stroke="{tier_color}" '
                          f'stroke-width="2.5"/>')
-            tier_y = (y1 - 15) if above else (y3 + 15)
-            labels.append(
-                f'<text x="{x:.1f}" y="{tier_y:.1f}" font-size="12" font-weight="700" fill="{tier_color}" '
-                f'text-anchor="end">터치 {tier}{r["score"]:+d} · 깊이{r["depth_pct"]:.1f}%p</text>')
         else:
             dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3" fill="{pct_color}"/>')
         labels.append(f'<text x="{x:.1f}" y="{y1:.1f}" font-size="12" fill="#5a5650" text-anchor="middle">'
@@ -459,8 +459,9 @@ def render_html(top_rows, total_candidates):
         chart_id = f"chart-{r['code']}"
         detail_closes = r["recent_closes"][-DETAIL_CHART_DAYS:]
         panel_content = _detail_chart_svg(r) + _multi_threshold_svg(detail_closes)
-        lightboxes_html.append(_chart_lightbox_html(
-            chart_id, f"{r['name']}({r['code']}) · 최근 구간", panel_content))
+        title = (f"{r['name']}({r['code']}) · 최근 구간 · "
+                 f'<span style="color:{color};">터치 {tier}{r["score"]:+d} · 깊이{r["depth_pct"]:.1f}%p</span>')
+        lightboxes_html.append(_chart_lightbox_html(chart_id, title, panel_content))
         rows_html.append(f'''<tr>
       <td>{i}</td>
       <td style="font-weight:700;">{r['name']}</td>
