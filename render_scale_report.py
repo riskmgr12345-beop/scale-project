@@ -310,8 +310,8 @@ def _detail_chart_svg(r):
     if len(closes) < 2:
         return "<div>데이터 부족</div>"
 
-    w, h = 900, 380
-    pad_x, top_pad, bottom_pad = 40, 90, 90
+    w, h = 1000, 420
+    pad_x, top_pad, bottom_pad = 40, 95, 95
     lo, hi = min(closes), max(closes)
     span = (hi - lo) or 1.0
     plot_h = h - top_pad - bottom_pad
@@ -356,11 +356,11 @@ def _detail_chart_svg(r):
                 f'text-anchor="end">터치 {tier}{r["score"]:+d} · 깊이{r["depth_pct"]:.1f}%p</text>')
         else:
             dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3" fill="{pct_color}"/>')
-        labels.append(f'<text x="{x:.1f}" y="{ly:.1f}" font-size="10.5" fill="#5a5650" text-anchor="middle">'
+        labels.append(f'<text x="{x:.1f}" y="{ly:.1f}" font-size="12" fill="#5a5650" text-anchor="middle">'
                        f'{date_label}</text>')
-        labels.append(f'<text x="{x:.1f}" y="{ly + dy2:.1f}" font-size="10.5" fill="#1c1d1f" '
+        labels.append(f'<text x="{x:.1f}" y="{ly + dy2:.1f}" font-size="12" fill="#1c1d1f" '
                        f'text-anchor="middle">{c:,.0f}</text>')
-        labels.append(f'<text x="{x:.1f}" y="{ly + dy3:.1f}" font-size="10.5" fill="{pct_color}" '
+        labels.append(f'<text x="{x:.1f}" y="{ly + dy3:.1f}" font-size="12" fill="{pct_color}" '
                        f'text-anchor="middle">{pct:+.1f}%</text>')
 
     leg_marker = ""
@@ -376,6 +376,52 @@ def _detail_chart_svg(r):
       {"".join(segs)}
       {"".join(dots)}
       {"".join(labels)}
+    </svg>'''
+
+
+MULTI_THRESHOLDS = [(0.03, "3%", "#2f6fd6"), (0.05, "5%", "#e0692f"), (0.07, "7%", "#1f9e6e"),
+                     (0.10, "10%", "#6b3fa0"), (0.20, "20%", "#d63d7a")]
+
+
+def _multi_threshold_svg(closes):
+    """2026-09-04 사용자 요청("3,5,7,10,20% 도 넣어줘") -- 여러 지그재그 임계값을 겹쳐 그려서,
+    지금 보는 다리가 더 큰 기준으로 봐도 여전히 같은 국면인지 비교. V3 ZZ 확대화면의 멀티임계값
+    비교차트와 같은 취지."""
+    n = len(closes)
+    if n < 2:
+        return ""
+    lo, hi = min(closes), max(closes)
+    span = (hi - lo) or 1.0
+    w, h, pad_x, top_pad, bottom_pad = 1000, 190, 40, 34, 14
+    plot_h = h - top_pad - bottom_pad
+    step = (w - 2 * pad_x) / (n - 1)
+
+    def xy(idx, price):
+        x = pad_x + idx * step
+        y = top_pad + (1 - (price - lo) / span) * plot_h
+        return x, y
+
+    legend = []
+    lines = []
+    for i, (threshold, label, color) in enumerate(MULTI_THRESHOLDS):
+        lx = pad_x + i * 90
+        legend.append(f'<line x1="{lx:.1f}" y1="12" x2="{lx+18:.1f}" y2="12" stroke="{color}" stroke-width="2.5"/>'
+                       f'<text x="{lx+22:.1f}" y="16" font-size="11" fill="#5a5650">{label}</text>')
+        swings = zigzag_swings(closes, threshold=threshold)
+        if len(swings) < 2:
+            continue
+        pts = [f"{xy(idx, price)[0]:.1f},{xy(idx, price)[1]:.1f}" for idx, price in swings]
+        lines.append(f'<polyline points="{" ".join(pts)}" fill="none" stroke="{color}" stroke-width="1.6" '
+                      f'opacity="0.85"/>')
+        for idx, price in swings:
+            x, y = xy(idx, price)
+            lines.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="2" fill="{color}"/>')
+
+    return f'''<div style="margin-top:10px;font-size:11.5px;color:#5a5650;font-weight:600;">
+    여러 기준선(3/5/7/10/20%) 비교 -- 큰 기준으로 보면 지금이 이미 다른 국면일 수 있음</div>
+    <svg width="100%" viewBox="0 0 {w} {h}" style="max-width:{w}px;">
+      {"".join(legend)}
+      {"".join(lines)}
     </svg>'''
 
 
@@ -406,8 +452,10 @@ def render_html(top_rows, total_candidates):
         color, bg = TIER_COLOR[tier]
         yr_pos_html = f"{r['yr_pos']:.0f}%" if r["yr_pos"] is not None else "-"
         chart_id = f"chart-{r['code']}"
+        detail_closes = r["recent_closes"][-DETAIL_CHART_DAYS:]
+        panel_content = _detail_chart_svg(r) + _multi_threshold_svg(detail_closes)
         lightboxes_html.append(_chart_lightbox_html(
-            chart_id, f"{r['name']}({r['code']}) · 최근 구간", _detail_chart_svg(r)))
+            chart_id, f"{r['name']}({r['code']}) · 최근 구간", panel_content))
         rows_html.append(f'''<tr>
       <td>{i}</td>
       <td style="font-weight:700;">{r['name']}</td>
@@ -446,7 +494,8 @@ def render_html(top_rows, total_candidates):
   .zz-lightbox:target {{ display:grid; place-items:center; }}
   .zz-lightbox-backdrop {{ position:absolute; inset:0; background:rgba(20,20,18,0.75); }}
   .zz-lightbox-panel {{ position:relative; background:#fff; border-radius:12px; padding:20px 28px 24px;
-                         max-width:94vw; max-height:90vh; overflow:auto; box-shadow:0 8px 40px rgba(0,0,0,0.35); }}
+                         width:min(1040px, 94vw); max-width:94vw; max-height:90vh; overflow:auto;
+                         box-shadow:0 8px 40px rgba(0,0,0,0.35); }}
   .zz-lightbox-title {{ font-size:14px; font-weight:700; margin-bottom:10px; padding-right:24px; }}
   .zz-lightbox-close {{ position:absolute; top:10px; right:14px; font-size:20px; line-height:1;
                          color:#898781; text-decoration:none; }}
