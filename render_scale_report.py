@@ -217,9 +217,79 @@ def render_text(top_rows, total_candidates):
     return "\n".join(lines)
 
 
+TIER_COLOR = {"강한이김": ("#0a8a3c", "#e8f5eb"), "약한이김": ("#7b6b1a", "#fbf3d8"),
+              "비김": ("#898781", "#f0efe9"), "짐": ("#c0392b", "#fbe9e7")}
+
+
+def _tier_of(score):
+    if score >= 2:
+        return "강한이김"
+    if score == 1:
+        return "약한이김"
+    if score == 0:
+        return "비김"
+    return "짐"
+
+
+def render_html(top_rows, total_candidates):
+    """2026-09-04 사용자 요청("사이트를 만들어서 거기서 볼 수 있게") -- GitHub Pages로 배포할
+    정적 HTML. V3/콜라 대시보드 계열과 같은 톤(단순 표+색 배지)으로 통일, 별도 프레임워크 없이
+    자체완결형 파일 하나."""
+    base_date = top_rows[0]["last_date"].date() if top_rows else "-"
+    strong_count = sum(1 for r in top_rows if r["score"] >= 2)
+    rows_html = []
+    for i, r in enumerate(top_rows, 1):
+        tier = _tier_of(r["score"])
+        color, bg = TIER_COLOR[tier]
+        yr_pos_html = f"{r['yr_pos']:.0f}%" if r["yr_pos"] is not None else "-"
+        rows_html.append(f'''<tr>
+      <td>{i}</td>
+      <td style="font-weight:700;">{r['name']}</td>
+      <td><span style="color:{color};background:{bg};border-radius:6px;padding:2px 8px;font-weight:700;">
+          {r['score']:+d} {tier}</span></td>
+      <td>하락다리 {r['leg_days']}일째</td>
+      <td style="color:{'#0a8a3c' if r['leg_pct'] >= 0 else '#c0392b'};">{r['leg_pct']:+.1f}%</td>
+      <td>{r['depth_pct']:.1f}%p</td>
+      <td>{yr_pos_html}</td>
+      <td style="text-align:right;">{r['cur_price']:,.0f}</td>
+    </tr>''')
+
+    return f'''<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>저울 -- 코스피+코스닥 상위 15</title>
+<style>
+  body {{ font-family: -apple-system, "Malgun Gothic", sans-serif; background:#faf9f6; color:#1c1d1f;
+         max-width: 900px; margin: 0 auto; padding: 24px 16px; }}
+  h1 {{ font-size: 20px; margin-bottom: 4px; }}
+  .sub {{ color:#70706a; font-size: 13px; margin-bottom: 20px; }}
+  table {{ width: 100%; border-collapse: collapse; font-size: 13px; }}
+  th {{ text-align:left; border-bottom: 2px solid #1c1d1f; padding: 8px 6px; color:#5a5650; }}
+  td {{ border-bottom: 1px solid #e5e3dc; padding: 8px 6px; }}
+  .note {{ margin-top: 20px; font-size: 12.5px; color:#898781; line-height:1.6; }}
+</style>
+</head><body>
+  <h1>⚖ 저울 -- 코스피+코스닥 상위 15</h1>
+  <div class="sub">기준일 {base_date} · 하락다리(반등기대) 후보 {total_candidates}종목 중 상위 15 ·
+    강한이김(≥2점) {strong_count}개</div>
+  <table>
+    <tr><th>#</th><th>종목명</th><th>저울점수</th><th>기간</th><th>다리등락%</th>
+        <th>되돌림깊이</th><th>52주위치</th><th style="text-align:right;">현재가</th></tr>
+    {"".join(rows_html)}
+  </table>
+  <div class="note">
+    ≥2점(강한이김)만 실측상 신뢰할 수 있는 신호입니다(도달률 72.8%/평균 +0.49%) -- 1점 이하는
+    평균이 오히려 마이너스였습니다. 매일 17:10(KST) 자동 갱신됩니다.
+    <br>공식 검증 근거: <a href="https://github.com/riskmgr12345-beop/scale-project">scale-project 저장소</a>
+  </div>
+</body></html>'''
+
+
 if __name__ == "__main__":
     top_rows, total = build_report()
     text = render_text(top_rows, total)
     with open("scale_top15_report.txt", "w", encoding="utf-8") as f:
         f.write(text)
+    with open("docs/index.html", "w", encoding="utf-8") as f:
+        f.write(render_html(top_rows, total))
     print(text)
