@@ -194,6 +194,20 @@ def year_range_position_pct(closes, highs, lows):
     return max(0.0, min(100.0, (cur - yr_low) / (yr_high - yr_low) * 100))
 
 
+def _drop_zero_volume_days(closes, highs, lows, volumes, dates):
+    """2026-09-04 사용자 발견("터치가 1번과 3번, 3번과는 다른거 같은데?") -- 엑사이엔씨 08-07이
+    O=H=L=C=760, 거래량=0인데 전후일(08-06/08-10/08-11)은 전부 3,800원으로 완전히 동일했던 걸
+    직접 짚어내서 발견한 데이터 결함. 거래정지 등으로 실제 거래가 없었던 날에 데이터공급사가
+    임의/오류값을 채워넣은 것으로 보임(V=0인데 가격만 있는 날). 지그재그/터치 계산 전체가 이런
+    날을 진짜 가격으로 오인하면 가짜 대폭락/급등 터치가 생길 수 있어, 거래량<=0인 날은 아예
+    시계열에서 제거하고(그 자리 자체가 없었던 것처럼) 나머지로만 계산한다."""
+    keep = [i for i, v in enumerate(volumes) if v and v > 0]
+    if len(keep) == len(volumes):
+        return closes, highs, lows, volumes, dates
+    return ([closes[i] for i in keep], [highs[i] for i in keep], [lows[i] for i in keep],
+            [volumes[i] for i in keep], [dates[i] for i in keep])
+
+
 def build_report():
     with open(_resolve_cache_path(), "rb") as f:
         cache = pickle.load(f)
@@ -206,9 +220,11 @@ def build_report():
             highs = df["High"].tolist()
             lows = df["Low"].tolist()
             volumes = df["Volume"].tolist()
-            dates_idx = df.index
+            dates_idx = list(df.index)
         except Exception:
             continue
+        closes, highs, lows, volumes, dates_idx = _drop_zero_volume_days(
+            closes, highs, lows, volumes, dates_idx)
         if len(closes) < 60:
             continue
 
