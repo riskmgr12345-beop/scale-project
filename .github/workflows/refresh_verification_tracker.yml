@@ -1,0 +1,41 @@
+name: 저울 검증추적 갱신
+
+# 2026-09-04 사용자 요청("오늘 추천종목 6일 후 다음주 금요일 79.3% 결과 보고해주고, 다리넘은
+# 종목 계속 결과 추적?") -- ZZ의 zz_score_tracker.json과 같은 개념을 저울에도 도입. 콜라
+# OHLCV 캐시는 주간 갱신이라 매일 정확한 추적이 안 되므로, 이 워크플로는 verification_tracker.
+# json에 있는 추적 대상 종목만 FinanceDataReader로 매일 최신 개별가를 받아 진행상황(본전회복/
+# 다리전환/5거래일 경과 완료처리)을 갱신한다. 클라우드 라우틴 샌드박스는 네트워크가 막혀
+# 있어서(ZZ/콜라와 동일 제약) 이 갱신을 못 하므로 GHA가 대신 전담한다. 매일 17:05 KST(=08:05
+# UTC) -- 저울 리포트 라우틴(17:10 KST)이 오늘 신규 종목을 심기 전에(seed) 먼저 어제까지의
+# 진행상황부터 갱신해두는 순서.
+
+on:
+  schedule:
+    - cron: '5 8 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install -r requirements.txt
+
+      - name: 검증추적 갱신
+        run: python verification_tracker.py
+
+      - name: 변경사항 커밋
+        run: |
+          git config user.name "scale-project-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add verification_tracker.json
+          git diff --cached --quiet || git commit -m "자동: 저울 검증추적 갱신 $(date -u +%Y-%m-%d)"
+          git push

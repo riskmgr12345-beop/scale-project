@@ -17,6 +17,8 @@ import pickle
 import statistics
 from datetime import datetime
 
+import verification_tracker
+
 # 2026-09-04 사용자 요청("①번 시장국면 배지부터 화면에 반영") -- regime_filter_test.py로
 # 검증된 실측치(강한이김>=2 기준, 시기분할 재현 확인). build_kospi_regime_cache.py(GHA로
 # 매일 17:00 KST 갱신)가 만든 캐시에서 오늘 국면만 읽어와 이 표로 매칭한다.
@@ -575,6 +577,60 @@ def _regime_badge_html(regime_data):
     </div>'''
 
 
+def _verification_section_html():
+    """2026-09-04 사용자 요청("오늘 추천종목 6일 후 다음주 금요일 79.3% 결과 보고해주고,
+    다리넘은 종목 계속 결과 추적?") -- ZZ의 검증추적 페이지와 같은 개념. verification_tracker.
+    json(별도 GHA refresh_verification_tracker.yml이 매일 FinanceDataReader로 개별종목 최신가를
+    받아 갱신)을 읽어서 진행중/완료 현황을 보여준다. 트래커의 "다리전환"은 진입가(신호 뜬 날
+    종가) 기준 3%+ 반등이지, 신호 이전부터 있던 다리의 진짜 저점 기준이 아님 -- 실제로 그 가격에
+    샀다고 가정했을 때의 반등이라 더 실전적인 정의(그래서 "본전회복"과 함께 이걸 보여준다)."""
+    tracker = verification_tracker._load_tracker()
+    stats = verification_tracker.summary_stats(tracker)
+
+    active_rows = []
+    for name, e in sorted(tracker["active"].items(), key=lambda kv: kv[1]["entry_date"]):
+        badges = []
+        if e["leg_flipped"]:
+            badges.append(f'<span class="verif-badge verif-badge-flip">다리전환 {e["leg_flip_date"]}</span>')
+        elif e["reached_breakeven"]:
+            badges.append(f'<span class="verif-badge verif-badge-reach">본전회복 {e["reached_date"]}</span>')
+        else:
+            badges.append('<span class="verif-badge verif-badge-wait">대기중</span>')
+        latest = e["history"][-1]["close"] if e.get("history") else e["entry_price"]
+        chg = (latest / e["entry_price"] - 1) * 100
+        active_rows.append(f'''<tr>
+          <td>{name}</td><td>{e["entry_date"]}</td>
+          <td style="text-align:right;">{e["entry_price"]:,.0f}</td>
+          <td style="text-align:right;">{latest:,.0f}</td>
+          <td style="text-align:right;color:{'#0a8a3c' if chg >= 0 else '#c0392b'};">{chg:+.2f}%</td>
+          <td>{e.get("days_elapsed", 0)}일차</td>
+          <td>{"".join(badges)}</td>
+        </tr>''')
+
+    if stats["n"] >= 15:
+        stat_line = (f'실측 n={stats["n"]} · 본전회복률 {stats["reached_pct"]:.1f}% · '
+                     f'다리전환률 {stats["flipped_pct"]:.1f}% · 평균수익 {stats["avg_return"]:+.2f}%')
+    elif stats["n"] > 0:
+        stat_line = f'실측 n={stats["n"]}(최소표본 15 미만이라 통계로 쓰기엔 아직 이름) -- 참고만'
+    else:
+        stat_line = '아직 완료된 추적 건 없음'
+
+    return f'''<div class="verif-section">
+      <div class="verif-title">📋 검증추적 -- 진행중 {len(tracker["active"])}개 · 완료 {len(tracker["completed"])}개</div>
+      <div class="verif-stat">{stat_line}</div>
+      <div class="table-scroll">
+      <table class="verif-table">
+        <tr><th>종목</th><th>진입일</th><th style="text-align:right;">진입가</th>
+            <th style="text-align:right;">최근가</th><th style="text-align:right;">등락</th>
+            <th>경과</th><th>상태</th></tr>
+        {"".join(active_rows) if active_rows else '<tr><td colspan="7">진행중인 추적 없음</td></tr>'}
+      </table>
+      </div>
+      <div class="verif-note">"본전회복"=진입가 이상 회복, "다리전환"=진입가 대비 3%+ 반등(더
+        엄격). 5거래일 지나면 완료로 이동합니다. 매일 GHA로 개별종목 실시간가 갱신.</div>
+    </div>'''
+
+
 def render_html(top_rows, total_candidates):
     """2026-09-04 사용자 요청("사이트를 만들어서 거기서 볼 수 있게") -- GitHub Pages로 배포할
     정적 HTML. V3/콜라 대시보드 계열과 같은 톤(단순 표+색 배지)으로 통일, 별도 프레임워크 없이
@@ -674,6 +730,17 @@ def render_html(top_rows, total_candidates):
   .regime-down {{ background:#e8f5eb; color:#0a5c29; border:1px solid #bfe3cb; }}
   .regime-up {{ background:#fbf3d8; color:#7b6b1a; border:1px solid #ecdca0; }}
   .regime-unknown {{ background:#f0efe9; color:#70706a; border:1px solid #e5e3dc; }}
+  .verif-section {{ margin-top:28px; border-top:1px solid #e5e3dc; padding-top:16px; }}
+  .verif-title {{ font-size:15px; font-weight:700; margin-bottom:4px; }}
+  .verif-stat {{ font-size:12.5px; color:#5a6b5e; margin-bottom:10px; }}
+  .verif-table {{ width:100%; min-width:640px; border-collapse:collapse; font-size:12.5px; }}
+  .verif-table th {{ text-align:left; border-bottom:2px solid #1c1d1f; padding:6px; color:#5a5650; }}
+  .verif-table td {{ border-bottom:1px solid #e5e3dc; padding:6px; }}
+  .verif-badge {{ display:inline-block; border-radius:5px; padding:1px 7px; font-size:11px; font-weight:700; }}
+  .verif-badge-flip {{ background:#e8f5eb; color:#0a8a3c; }}
+  .verif-badge-reach {{ background:#f3f2ea; color:#7b6b1a; }}
+  .verif-badge-wait {{ background:#f0efe9; color:#898781; }}
+  .verif-note {{ margin-top:8px; font-size:11.5px; color:#898781; line-height:1.6; }}
   .zz-chart-link {{ display:inline-block; cursor:zoom-in; border-radius:6px; }}
   .zz-chart-link:hover {{ outline:2px solid #cfe0f5; }}
   .zz-lightbox {{ display:none; position:fixed; inset:0; z-index:1000; }}
@@ -706,12 +773,25 @@ def render_html(top_rows, total_candidates):
     평균이 오히려 마이너스였습니다. 매일 17:10(KST) 자동 갱신됩니다.
     <br>공식 검증 근거: <a href="https://github.com/riskmgr12345-beop/scale-project">scale-project 저장소</a>
   </div>
+  {_verification_section_html()}
   {"".join(lightboxes_html)}
 </body></html>'''
 
 
 if __name__ == "__main__":
     top_rows, total = build_report()
+
+    # 2026-09-04 사용자 요청("오늘 추천종목... 다리넘은 종목 계속 결과 추적?") -- 오늘 새로
+    # 뽑힌 강한이김 종목을 검증추적 트래커에 심는다(네트워크 불필요, seed만). 실제 진행상황
+    # 갱신(FinanceDataReader 필요)은 별도 GHA(refresh_verification_tracker.yml)가 매일 담당 --
+    # 여기서 하지 않는 이유는 클라우드 라우틴 샌드박스에서 네트워크가 막혀 있기 때문(ZZ/콜라와
+    # 동일한 제약).
+    tracker = verification_tracker._load_tracker()
+    added = verification_tracker.seed_from_top_rows(tracker, top_rows)
+    verification_tracker._save_tracker(tracker)
+    if added:
+        print(f"검증추적에 신규 추가: {added}")
+
     text = render_text(top_rows, total)
     with open("scale_top15_report.txt", "w", encoding="utf-8") as f:
         f.write(text)
