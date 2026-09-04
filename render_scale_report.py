@@ -371,7 +371,7 @@ def _detail_chart_svg(r):
                       f'<text x="{lx:.1f}" y="{top_pad - 12:.1f}" font-size="11" font-weight="700" '
                       f'fill="#5b3fa0" text-anchor="middle">다리 시작</text>')
 
-    return f'''<svg width="100%" viewBox="0 0 {w} {h}" style="max-width:{w}px;">
+    return f'''<svg width="100%" viewBox="0 0 {w} {h}">
       {leg_marker}
       {"".join(segs)}
       {"".join(dots)}
@@ -419,7 +419,7 @@ def _multi_threshold_svg(closes):
 
     return f'''<div style="margin-top:10px;font-size:11.5px;color:#5a5650;font-weight:600;">
     여러 기준선(3/5/7/10/20%) 비교 -- 큰 기준으로 보면 지금이 이미 다른 국면일 수 있음</div>
-    <svg width="100%" viewBox="0 0 {w} {h}" style="max-width:{w}px;">
+    <svg width="100%" viewBox="0 0 {w} {h}">
       {"".join(legend)}
       {"".join(lines)}
     </svg>'''
@@ -494,7 +494,7 @@ def render_html(top_rows, total_candidates):
   .zz-lightbox:target {{ display:grid; place-items:center; }}
   .zz-lightbox-backdrop {{ position:absolute; inset:0; background:rgba(20,20,18,0.75); }}
   .zz-lightbox-panel {{ position:relative; background:#fff; border-radius:12px; padding:20px 28px 24px;
-                         width:min(1040px, 94vw); max-width:94vw; max-height:90vh; overflow:auto;
+                         width:96vw; max-width:1500px; max-height:92vh; overflow:auto;
                          box-shadow:0 8px 40px rgba(0,0,0,0.35); }}
   .zz-lightbox-title {{ font-size:14px; font-weight:700; margin-bottom:10px; padding-right:24px; }}
   .zz-lightbox-close {{ position:absolute; top:10px; right:14px; font-size:20px; line-height:1;
