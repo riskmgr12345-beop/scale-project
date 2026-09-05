@@ -68,6 +68,29 @@ def _dart_badge_html(code, dart_cache):
             f'공식 관리종목 지정과는 별개">💸 {reason}</span>')
 
 
+def _market_status_badge_html(code, dart_cache):
+    """2026-09-05 사용자 요청("순서대로 시작해") ③PER/관리종목 여부 -- ZZ의 "객관가치" 배지
+    중 관리종목/PER 부분을 저울에 포팅. ZZ는 KIS 실시간 API(인증 세션 필요)로 얻지만 저울은
+    GHA 배치라 그 세션이 없어서, dart_risk_check.py가 FinanceDataReader.StockListing의 Dept
+    컬럼(관리종목/투자주의환기 여부는 KRX 공식 지정이라 DART 재무제표 기반 경고와는 성격이
+    다름 -- 둘 다 있으면 별개로 나란히 표시)과 PER(시총/DART당기순이익)을 대신 계산해둔다."""
+    entry = dart_cache.get(code)
+    if not entry:
+        return ""
+    ms = entry.get("market_status") or {}
+    parts = []
+    if ms.get("management_issue"):
+        parts.append('<span style="color:#a01818;font-weight:700;">⚠관리종목</span>')
+    elif ms.get("caution_issue"):
+        parts.append('<span style="color:#a05818;font-weight:700;">⚠투자주의환기</span>')
+    per = ms.get("per")
+    if per is not None:
+        parts.append(f'PER {per:.1f}배' if per > 0 else 'PER 적자')
+    if not parts:
+        return ""
+    return f'<span class="market-status-badge">{" · ".join(parts)}</span>'
+
+
 def _disclosure_html(code, dart_cache):
     """2026-09-05 사용자 요청("이어해" -- ②최근 60일 공시 화면표시) -- 콜라
     render_dashboard.py의 _disclosure_html과 같은 톤. 확대차트 라이트박스 안에 같이 넣어서
@@ -711,6 +734,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
         color, bg = TIER_COLOR[tier]
         yr_pos_html = f"{r['yr_pos']:.0f}%" if r["yr_pos"] is not None else "-"
         dart_badge = _dart_badge_html(r["code"], dart_cache)
+        market_badge = _market_status_badge_html(r["code"], dart_cache)
         chart_id = f"chart-{panel_id}-{r['code']}"
         detail_closes = r["recent_closes"][-DETAIL_CHART_DAYS:]
         panel_content = (_detail_chart_svg(r) + _multi_threshold_svg(detail_closes)
@@ -720,7 +744,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
         lightboxes_html.append(_chart_lightbox_html(chart_id, title, panel_content))
         rows_html.append(f'''<tr>
       <td>{i}</td>
-      <td style="font-weight:700;">{r['name']}{dart_badge}</td>
+      <td style="font-weight:700;">{r['name']}{dart_badge}{market_badge}</td>
       <td style="color:#898781;font-variant-numeric:tabular-nums;">{r['code']}</td>
       <td><span style="color:{color};background:{bg};border-radius:6px;padding:2px 8px;font-weight:700;">
           {r['score']:+d} {tier}</span></td>
@@ -740,6 +764,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
         color, bg = TIER_COLOR["강한이김"]
         chart_id = f"chart-{panel_id}-{r['code']}"
         item_dart_badge = _dart_badge_html(r["code"], dart_cache)
+        item_market_badge = _market_status_badge_html(r["code"], dart_cache)
         strong_items_html.append(f'''<a href="#{chart_id}" class="strong-item">
           <span class="strong-item-top">
             <span class="strong-item-name">{r['name']}</span>
@@ -748,6 +773,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
           </span>
           <span class="strong-item-sub">되돌림 {r['depth_pct']:.1f}%p · 하락다리 {r['leg_days']}일째 · {r['cur_price']:,.0f}원</span>
           {f'<span class="strong-item-dart">{item_dart_badge}</span>' if item_dart_badge else ''}
+          {f'<span class="strong-item-dart">{item_market_badge}</span>' if item_market_badge else ''}
         </a>''')
     stat = STAT_BY_DEPTH.get(min_depth, {"reach": None, "avg": None, "n": "?"})
     stat_txt = (f"5일 도달률 {stat['reach']:.1f}% · 평균 {stat['avg']:+.2f}% (2,700종목/n={stat['n']} 검증)"
@@ -767,10 +793,18 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
     # 걸러서, 기존 강한이김 박스보다 위에 별도 박스로 보여준다. "저울점수로 걸렀는데 회사
     # 자체는 위험한" 경우(원풍물산류)를 이 박스에서는 아예 제외 -- 리스크까지 감안한 최종
     # 추천 목록의 성격.
-    safe_rows = [r for r in strong_rows if not _dart_badge_html(r["code"], dart_cache)]
+    # 2026-09-05(③PER/관리종목 여부 포팅 시 확장) -- KRX 공식 관리종목/투자주의환기 지정도
+    # DART 재무경고와 별개의 진짜 리스크 신호라, 같은 최종후보 박스에서 같이 걸러낸다.
+    safe_rows = [
+        r for r in strong_rows
+        if not _dart_badge_html(r["code"], dart_cache)
+        and not (dart_cache.get(r["code"], {}).get("market_status") or {}).get("management_issue")
+        and not (dart_cache.get(r["code"], {}).get("market_status") or {}).get("caution_issue")
+    ]
     safe_items_html = []
     for r in safe_rows:
         chart_id = f"chart-{panel_id}-{r['code']}"
+        safe_item_market_badge = _market_status_badge_html(r["code"], dart_cache)
         safe_items_html.append(f'''<a href="#{chart_id}" class="strong-item safe-item">
           <span class="strong-item-top">
             <span class="strong-item-name">{r['name']}</span>
@@ -778,10 +812,11 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
             <span class="strong-item-score">{r['score']:+d}</span>
           </span>
           <span class="strong-item-sub">되돌림 {r['depth_pct']:.1f}%p · 하락다리 {r['leg_days']}일째 · {r['cur_price']:,.0f}원</span>
+          {f'<span class="strong-item-dart">{safe_item_market_badge}</span>' if safe_item_market_badge else ''}
         </a>''')
     safe_box_html = f'''<div class="strong-box safe-box">
       <div class="strong-box-title">✅ 강한이김 + 재무경고 없음 -- 리스크까지 거른 최종 후보
-        <span class="strong-box-stat">DART 완전자본잠식/3년연속적자 없는 것만 ({len(safe_rows)}/{len(strong_rows)}개)</span>
+        <span class="strong-box-stat">DART 재무경고·관리종목·투자주의환기 없는 것만 ({len(safe_rows)}/{len(strong_rows)}개)</span>
       </div>
       <div class="strong-box-grid">{"".join(safe_items_html)}</div>
     </div>''' if strong_rows else ""
@@ -881,6 +916,8 @@ def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
   .verif-note {{ margin-top:8px; font-size:11.5px; color:#898781; line-height:1.6; }}
   .dart-badge {{ display:inline-block; margin-left:6px; font-size:10.5px; font-weight:700;
                   color:#a05a1a; background:#fbeed8; border-radius:5px; padding:1px 6px; }}
+  .market-status-badge {{ display:inline-block; margin-left:6px; font-size:10.5px; font-weight:700;
+                  color:#5a5650; background:#f0efe9; border-radius:5px; padding:1px 6px; }}
   .strong-item-dart {{ display:block; margin-top:4px; }}
   .safe-box {{ border-color:#0a8a3c; }}
   .disclosure-box {{ margin-top:10px; padding:8px 10px; background:#f7f6f2; border:1px solid #e5e3dc;

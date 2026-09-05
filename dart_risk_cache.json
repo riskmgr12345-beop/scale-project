@@ -33,7 +33,12 @@
     "date": "20260826",
     "title": "기타주요경영사항(자회사의 주요경영사항)              (회사합병 결정 및 임시주주총회 소집결의 철회)"
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": 3.682625598004586
+  }
  },
  "314930": {
   "checked_at": 1788572395.3673942,
@@ -61,7 +66,12 @@
     "date": "20260713",
     "title": "임원ㆍ주요주주특정증권등소유상황보고서"
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": 242.56035502770072
+  }
  },
  "251370": {
   "checked_at": 1788572395.3673942,
@@ -97,7 +107,12 @@
     "date": "20260827",
     "title": "임원ㆍ주요주주특정증권등소유상황보고서"
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": 85.57723234812052
+  }
  },
  "323990": {
   "checked_at": 1788572395.3673942,
@@ -112,7 +127,12 @@
    "fiscal_year": "2025",
    "reason": "3년 연속 당기순손실"
   },
-  "disclosures": []
+  "disclosures": [],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -7.9848920558256635
+  }
  },
  "030530": {
   "checked_at": 1788572395.3673942,
@@ -148,7 +168,12 @@
     "date": "20260828",
     "title": "유상증자결정(종속회사의주요경영사항)              "
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": 34.46274308322278
+  }
  },
  "305090": {
   "checked_at": 1788572395.3673942,
@@ -184,7 +209,12 @@
     "date": "20260831",
     "title": "반기검토(감사)의견부적정등사실확인(자본잠식률100분의50이상또는자기자본10억원미만포함)              "
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": true,
+   "per": -0.7673642221217484
+  }
  },
  "084180": {
   "checked_at": 1788572395.3673942,
@@ -220,7 +250,12 @@
     "date": "20260810",
     "title": "주식등의대량보유상황보고서(약식)"
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": true,
+   "caution_issue": false,
+   "per": null
+  }
  },
  "142760": {
   "checked_at": 1788572395.3673942,
@@ -256,7 +291,12 @@
     "date": "20260827",
     "title": "[기재정정]최대주주변경을수반하는주식담보제공계약체결              "
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": true,
+   "caution_issue": false,
+   "per": -0.8400339448804455
+  }
  },
  "263800": {
   "checked_at": 1788572395.3673942,
@@ -292,7 +332,12 @@
     "date": "20260707",
     "title": "주권매매거래정지              (단일판매공급계약)"
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": 73.5086278535657
+  }
  },
  "0007C0": {
   "checked_at": 1788572395.3673942,
@@ -324,7 +369,12 @@
     "date": "20260722",
     "title": "단일판매ㆍ공급계약체결(자율공시)              "
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -46.90140812366623
+  }
  },
  "090470": {
   "checked_at": 1788572395.3673942,
@@ -348,7 +398,12 @@
     "date": "20260902",
     "title": "단일판매ㆍ공급계약체결              "
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -3.166687120282693
+  }
  },
  "053950": {
   "checked_at": 1788572395.3673942,
@@ -384,7 +439,12 @@
     "date": "20260708",
     "title": "임원ㆍ주요주주특정증권등소유상황보고서"
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -4.182426958418277
+  }
  },
  "417310": {
   "checked_at": 1788572395.3673942,
@@ -420,7 +480,12 @@
     "date": "20260821",
     "title": "정기주주총회결과              "
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": 32.5021753786975
+  }
  },
  "338220": {
   "checked_at": 1788572395.3673942,
@@ -452,7 +517,12 @@
     "date": "20260826",
     "title": "전환사채(해외전환사채포함)발행후만기전사채취득              "
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -12.718992638937872
+  }
  },
  "095910": {
   "checked_at": 1788572395.3673942,
@@ -488,7 +558,12 @@
     "date": "20260805",
     "title": "기타시장안내(관리종목지정우려종목)              (주가 1,000원 미달)"
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": true,
+   "caution_issue": false,
+   "per": -0.791132246645168
+  }
  },
  "087010": {
   "checked_at": 1788572395.3673942,
@@ -520,7 +595,12 @@
     "date": "20260714",
     "title": "임원ㆍ주요주주특정증권등소유상황보고서"
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -265.32673855968187
+  }
  },
  "012170": {
   "checked_at": 1788572395.3673942,
@@ -556,7 +636,12 @@
     "date": "20260824",
     "title": "소송등의제기ㆍ신청(경영권분쟁소송)              "
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -1.5039543226890675
+  }
  },
  "243070": {
   "checked_at": 1788572395.3673942,
@@ -592,7 +677,12 @@
     "date": "20260811",
     "title": "현금ㆍ현물배당결정              (분기배당)"
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": 5.997794732732479
+  }
  },
  "242040": {
   "checked_at": 1788572395.3673942,
@@ -620,7 +710,12 @@
     "date": "20260713",
     "title": "대표이사변경              "
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -55.814132215397116
+  }
  },
  "475560": {
   "checked_at": 1788572395.3673942,
@@ -640,6 +735,11 @@
     "date": "20260828",
     "title": "주식등의대량보유상황보고서(일반)"
    }
-  ]
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -13.15379861690599
+  }
  }
 }

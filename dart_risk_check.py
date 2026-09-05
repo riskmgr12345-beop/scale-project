@@ -25,6 +25,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 
 import requests
+import FinanceDataReader as fdr
 
 DART_BASE_URL = "https://opendart.fss.or.kr/api"
 CORP_CODE_CACHE_FILE = "dart_corp_codes.json"
@@ -151,6 +152,40 @@ def check_capital(code, corp_map):
     return {"warning": None, "reason": "재무제표 조회 실패(연도 3개 다 없음)"}
 
 
+MANAGEMENT_ISSUE_DEPT = "관리종목(소속부없음)"
+CAUTION_ISSUE_DEPT = "투자주의환기종목(소속부없음)"
+
+
+def _load_krx_listing():
+    """2026-09-05 사용자 요청("v3...zz 등에서 분석 적용한 내용중 저울에 적용" -> "순서대로
+    시작해") ③PER/관리종목 여부 -- ZZ의 "객관가치" 배지(PER+관리종목/거래정지/투자경고)는
+    KIS 실시간 API(get_current_price의 per/mang_issu_cls_code 필드, 인증된 실계좌 세션 필요)를
+    쓰는데, 저울은 GHA 배치라 그런 세션이 없다. 대신 FinanceDataReader.StockListing('KRX')의
+    Dept 컬럼에 "관리종목(소속부없음)"/"투자주의환기종목(소속부없음)"이 그대로 들어있어서
+    (실측 확인됨) 인증 없이 동일 정보를 얻을 수 있다 -- pykrx도 시도했으나 KRX가 OTP
+    발급단계에서 막아 현재 로컬에서도 전부 실패(날짜와 무관하게 재현), FDR이 유일하게
+    바로 되는 경로."""
+    df = fdr.StockListing('KRX')
+    return {row.Code: row for row in df.itertuples()}
+
+
+def check_market_status(code, krx_listing, net_income):
+    """관리종목/투자주의환기 여부(KRX 공식 지정) + PER(시가총액/당기순이익, DART 당기순이익을
+    이미 check_capital()에서 가져왔으므로 재활용 -- KIS의 EPS기반 PER과 정의는 동일, 발행주식수
+    대신 시총을 바로 쓸 뿐이라 오차 없음). code가 리스트에 없으면(우선주 등) 전부 None."""
+    row = krx_listing.get(code)
+    if row is None:
+        return {"management_issue": None, "caution_issue": None, "per": None}
+    dept = getattr(row, "Dept", None)
+    management_issue = dept == MANAGEMENT_ISSUE_DEPT
+    caution_issue = dept == CAUTION_ISSUE_DEPT
+    marcap = getattr(row, "Marcap", None)
+    per = None
+    if marcap and net_income is not None and net_income != 0:
+        per = marcap / net_income
+    return {"management_issue": management_issue, "caution_issue": caution_issue, "per": per}
+
+
 def fetch_recent_disclosures(code, corp_map):
     """render_dashboard.py의 _fetch_recent_disclosures와 동일 로직(정기공시 제외)."""
     try:
@@ -190,27 +225,41 @@ def _save_cache(cache):
 def update_for_codes(codes):
     """오늘 상위 20개 종목코드 리스트를 받아 DART 재무경고+최근공시를 조회/캐시 갱신.
     개별 종목 실패는 조용히 건너뛰고 다음 종목으로(콜라와 동일 관례 -- 이 정보가 없다고
-    리포트 전체가 죽으면 안 됨)."""
+    리포트 전체가 죽으면 안 됨).
+
+    2026-09-05(③PER/관리종목 여부 추가 시) -- market_status는 DART API 호출이 아니라
+    FinanceDataReader 벌크조회 1번(_load_krx_listing) + 이미 있는 capital 캐시의 당기순이익만
+    쓰므로 API 부담이 없다. 그래서 60일 캐시 게이트(CACHE_DAYS, 분기 단위로만 바뀌는 재무제표용)
+    와 무관하게 매번 갱신 -- 안 그러면 이미 60일 캐시가 살아있는 기존 20종목은 market_status
+    필드가 영영 안 채워진다(다음 재무제표 갱신 시점까지 무기한 누락)."""
     cache = _load_cache()
     corp_map = get_corp_code_map()
+    krx_listing = _load_krx_listing()
     now = time.time()
     checked = 0
     for code in codes:
         if not code or code == "-":
             continue
         entry = cache.get(code)
-        if entry and (now - entry.get("checked_at", 0)) / 86400 < CACHE_DAYS:
+        fresh = entry and (now - entry.get("checked_at", 0)) / 86400 < CACHE_DAYS
+        if fresh:
+            net_income = (entry.get("capital", {}).get("net_income_3y") or [None])[0]
+            entry["market_status"] = check_market_status(code, krx_listing, net_income)
             continue
         try:
             capital = check_capital(code, corp_map)
             time.sleep(0.12)
             disclosures = fetch_recent_disclosures(code, corp_map)
             time.sleep(0.12)
-            cache[code] = {"checked_at": now, "capital": capital, "disclosures": disclosures}
+            net_income = (capital.get("net_income_3y") or [None])[0]
+            market_status = check_market_status(code, krx_listing, net_income)
+            cache[code] = {"checked_at": now, "capital": capital, "disclosures": disclosures,
+                            "market_status": market_status}
             checked += 1
         except Exception as e:
             cache[code] = {"checked_at": now, "capital": {"warning": None, "reason": f"조회 오류: {e}"},
-                            "disclosures": []}
+                            "disclosures": [], "market_status": {"management_issue": None,
+                            "caution_issue": None, "per": None}}
     _save_cache(cache)
     return checked
 
