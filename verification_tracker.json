@@ -467,11 +467,21 @@
       "score": 3,
       "depth_pct_at_entry": 65.66687938736439,
       "running_low": 538.0,
-      "reached_breakeven": false,
-      "reached_date": null,
+      "reached_breakeven": true,
+      "reached_date": "2026-09-04",
       "leg_flipped": false,
       "leg_flip_date": null,
-      "history": []
+      "history": [
+        {
+          "date": "2026-09-03",
+          "close": 538
+        },
+        {
+          "date": "2026-09-04",
+          "close": 538
+        }
+      ],
+      "days_elapsed": 1
     },
     "수성웹툰": {
       "code": "084180",
@@ -480,11 +490,21 @@
       "score": 3,
       "depth_pct_at_entry": 30.0,
       "running_low": 385.0,
-      "reached_breakeven": false,
-      "reached_date": null,
+      "reached_breakeven": true,
+      "reached_date": "2026-09-04",
       "leg_flipped": false,
       "leg_flip_date": null,
-      "history": []
+      "history": [
+        {
+          "date": "2026-09-03",
+          "close": 385
+        },
+        {
+          "date": "2026-09-04",
+          "close": 395
+        }
+      ],
+      "days_elapsed": 1
     },
     "모아라이프플러스": {
       "code": "142760",
@@ -492,12 +512,22 @@
       "entry_price": 549.0,
       "score": 3,
       "depth_pct_at_entry": 20.3240058910162,
-      "running_low": 549.0,
+      "running_low": 520,
       "reached_breakeven": false,
       "reached_date": null,
       "leg_flipped": false,
       "leg_flip_date": null,
-      "history": []
+      "history": [
+        {
+          "date": "2026-09-03",
+          "close": 549
+        },
+        {
+          "date": "2026-09-04",
+          "close": 520
+        }
+      ],
+      "days_elapsed": 1
     },
     "데이타솔루션": {
       "code": "263800",
@@ -506,11 +536,21 @@
       "score": 3,
       "depth_pct_at_entry": 18.0,
       "running_low": 4610.0,
-      "reached_breakeven": false,
-      "reached_date": null,
+      "reached_breakeven": true,
+      "reached_date": "2026-09-04",
       "leg_flipped": false,
       "leg_flip_date": null,
-      "history": []
+      "history": [
+        {
+          "date": "2026-09-03",
+          "close": 4610
+        },
+        {
+          "date": "2026-09-04",
+          "close": 4745
+        }
+      ],
+      "days_elapsed": 1
     },
     "아크릴": {
       "code": "0007C0",
@@ -519,11 +559,21 @@
       "score": 3,
       "depth_pct_at_entry": 13.381995133819952,
       "running_low": 14580.0,
-      "reached_breakeven": false,
-      "reached_date": null,
-      "leg_flipped": false,
-      "leg_flip_date": null,
-      "history": []
+      "reached_breakeven": true,
+      "reached_date": "2026-09-04",
+      "leg_flipped": true,
+      "leg_flip_date": "2026-09-04",
+      "history": [
+        {
+          "date": "2026-09-03",
+          "close": 14580
+        },
+        {
+          "date": "2026-09-04",
+          "close": 16400
+        }
+      ],
+      "days_elapsed": 1
     },
     "제이스로보틱스": {
       "code": "090470",
@@ -532,11 +582,21 @@
       "score": 3,
       "depth_pct_at_entry": 11.91919191919192,
       "running_low": 4450.0,
-      "reached_breakeven": false,
-      "reached_date": null,
-      "leg_flipped": false,
-      "leg_flip_date": null,
-      "history": []
+      "reached_breakeven": true,
+      "reached_date": "2026-09-04",
+      "leg_flipped": true,
+      "leg_flip_date": "2026-09-04",
+      "history": [
+        {
+          "date": "2026-09-03",
+          "close": 4450
+        },
+        {
+          "date": "2026-09-04",
+          "close": 4600
+        }
+      ],
+      "days_elapsed": 1
     },
     "경남제약": {
       "code": "053950",
@@ -544,12 +604,22 @@
       "entry_price": 1974.0,
       "score": 3,
       "depth_pct_at_entry": 11.80995475113122,
-      "running_low": 1974.0,
+      "running_low": 1920,
       "reached_breakeven": false,
       "reached_date": null,
       "leg_flipped": false,
       "leg_flip_date": null,
-      "history": []
+      "history": [
+        {
+          "date": "2026-09-03",
+          "close": 1974
+        },
+        {
+          "date": "2026-09-04",
+          "close": 1920
+        }
+      ],
+      "days_elapsed": 1
     },
     "코람코더원리츠": {
       "code": "417310",
@@ -558,11 +628,21 @@
       "score": 2,
       "depth_pct_at_entry": 78.649138712602,
       "running_low": 2365.0,
-      "reached_breakeven": false,
-      "reached_date": null,
+      "reached_breakeven": true,
+      "reached_date": "2026-09-04",
       "leg_flipped": false,
       "leg_flip_date": null,
-      "history": []
+      "history": [
+        {
+          "date": "2026-09-03",
+          "close": 2365
+        },
+        {
+          "date": "2026-09-04",
+          "close": 2370
+        }
+      ],
+      "days_elapsed": 1
     },
     "뷰노": {
       "code": "338220",
@@ -571,11 +651,21 @@
       "score": 2,
       "depth_pct_at_entry": 37.530562347188265,
       "running_low": 5220.0,
-      "reached_breakeven": false,
-      "reached_date": null,
+      "reached_breakeven": true,
+      "reached_date": "2026-09-04",
       "leg_flipped": false,
       "leg_flip_date": null,
-      "history": []
+      "history": [
+        {
+          "date": "2026-09-03",
+          "close": 5220
+        },
+        {
+          "date": "2026-09-04",
+          "close": 5250
+        }
+      ],
+      "days_elapsed": 1
     },
     "에스에너지": {
       "code": "095910",
@@ -584,11 +674,21 @@
       "score": 2,
       "depth_pct_at_entry": 20.948616600790515,
       "running_low": 615.0,
-      "reached_breakeven": false,
-      "reached_date": null,
+      "reached_breakeven": true,
+      "reached_date": "2026-09-04",
       "leg_flipped": false,
       "leg_flip_date": null,
-      "history": []
+      "history": [
+        {
+          "date": "2026-09-03",
+          "close": 615
+        },
+        {
+          "date": "2026-09-04",
+          "close": 623
+        }
+      ],
+      "days_elapsed": 1
     },
     "펩트론": {
       "code": "087010",
@@ -597,11 +697,21 @@
       "score": 2,
       "depth_pct_at_entry": 20.687772925764193,
       "running_low": 146600.0,
-      "reached_breakeven": false,
-      "reached_date": null,
-      "leg_flipped": false,
-      "leg_flip_date": null,
-      "history": []
+      "reached_breakeven": true,
+      "reached_date": "2026-09-04",
+      "leg_flipped": true,
+      "leg_flip_date": "2026-09-04",
+      "history": [
+        {
+          "date": "2026-09-03",
+          "close": 146600
+        },
+        {
+          "date": "2026-09-04",
+          "close": 157300
+        }
+      ],
+      "days_elapsed": 1
     },
     "아센디오": {
       "code": "012170",
@@ -609,12 +719,22 @@
       "entry_price": 2975.0,
       "score": 2,
       "depth_pct_at_entry": 20.588235294117645,
-      "running_low": 2975.0,
+      "running_low": 2845,
       "reached_breakeven": false,
       "reached_date": null,
       "leg_flipped": false,
       "leg_flip_date": null,
-      "history": []
+      "history": [
+        {
+          "date": "2026-09-03",
+          "close": 2975
+        },
+        {
+          "date": "2026-09-04",
+          "close": 2845
+        }
+      ],
+      "days_elapsed": 1
     },
     "휴온스": {
       "code": "243070",
@@ -623,11 +743,21 @@
       "score": 2,
       "depth_pct_at_entry": 20.306513409961685,
       "running_low": 20950.0,
-      "reached_breakeven": false,
-      "reached_date": null,
+      "reached_breakeven": true,
+      "reached_date": "2026-09-04",
       "leg_flipped": false,
       "leg_flip_date": null,
-      "history": []
+      "history": [
+        {
+          "date": "2026-09-03",
+          "close": 20950
+        },
+        {
+          "date": "2026-09-04",
+          "close": 21150
+        }
+      ],
+      "days_elapsed": 1
     },
     "나무에이엑스": {
       "code": "242040",
@@ -636,11 +766,21 @@
       "score": 2,
       "depth_pct_at_entry": 19.230769230769234,
       "running_low": 2975.0,
-      "reached_breakeven": false,
-      "reached_date": null,
+      "reached_breakeven": true,
+      "reached_date": "2026-09-04",
       "leg_flipped": false,
       "leg_flip_date": null,
-      "history": []
+      "history": [
+        {
+          "date": "2026-09-03",
+          "close": 2975
+        },
+        {
+          "date": "2026-09-04",
+          "close": 3030
+        }
+      ],
+      "days_elapsed": 1
     },
     "더본코리아": {
       "code": "475560",
@@ -649,11 +789,21 @@
       "score": 2,
       "depth_pct_at_entry": 18.61353711790393,
       "running_low": 15090.0,
-      "reached_breakeven": false,
-      "reached_date": null,
+      "reached_breakeven": true,
+      "reached_date": "2026-09-04",
       "leg_flipped": false,
       "leg_flip_date": null,
-      "history": []
+      "history": [
+        {
+          "date": "2026-09-03",
+          "close": 15090
+        },
+        {
+          "date": "2026-09-04",
+          "close": 15430
+        }
+      ],
+      "days_elapsed": 1
     }
   },
   "completed": {}
