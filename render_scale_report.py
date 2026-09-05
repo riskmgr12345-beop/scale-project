@@ -269,10 +269,21 @@ def _trailing_zero_volume_run(volumes):
     return run
 
 
-def build_report():
+def _load_cache_and_names():
     with open(_resolve_cache_path(), "rb") as f:
         cache = pickle.load(f)
-    name_to_code = _load_name_to_code()
+    return cache, _load_name_to_code()
+
+
+def build_report(cache=None, name_to_code=None, min_depth=MIN_DEPTH):
+    """2026-09-05 사용자 요청("저울에 15% 이상 버튼을 만드는건 어때?") -- 오늘 검증한
+    MIN_DEPTH 스윕(7%->10~12%는 안전한 개선, 15%는 경계선, 20%+는 표본부족/거래정지
+    이상치로 기각)을 실제로 눈으로 비교해볼 수 있게, 문턱을 인자로 받도록 리팩터링.
+    기본값(2.0%)은 기존 동작 그대로 유지 -- 후보군을 넓게 봐서 저울점수로 거르는 용도라
+    검증치(7%)보다 낮게 잡은 원래 설계는 안 바꾼다. cache/name_to_code를 인자로 받게 해서
+    "전체(2%+)"와 "깊은눌림(15%+)" 두 화면을 한 번의 캐시 로딩으로 같이 만들 수 있다."""
+    if cache is None or name_to_code is None:
+        cache, name_to_code = _load_cache_and_names()
 
     rows = []
     for name, df in cache.items():
@@ -295,7 +306,7 @@ def build_report():
         if not pos or pos["leg_dir"] != "down":
             continue
         depth_pct = touch_depth_now(closes, lows, pos)
-        if depth_pct is None or depth_pct < MIN_DEPTH:
+        if depth_pct is None or depth_pct < min_depth:
             continue
 
         entry_price = closes[-1]
@@ -631,21 +642,25 @@ def _verification_section_html():
     </div>'''
 
 
-def render_html(top_rows, total_candidates):
-    """2026-09-04 사용자 요청("사이트를 만들어서 거기서 볼 수 있게") -- GitHub Pages로 배포할
-    정적 HTML. V3/콜라 대시보드 계열과 같은 톤(단순 표+색 배지)으로 통일, 별도 프레임워크 없이
-    자체완결형 파일 하나."""
-    base_date = top_rows[0]["last_date"].date() if top_rows else "-"
-    regime_html = _regime_badge_html(_load_kospi_regime())
+STAT_BY_DEPTH = {
+    2.0: {"reach": 72.8, "avg": 0.49, "n": "77,750"},
+    15.0: {"reach": 76.7, "avg": 2.24, "n": "7,149"},
+}
+
+
+def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
+    """2026-09-05 사용자 요청("저울에 15% 이상 버튼을 만드는건 어때?") -- 기존 render_html의
+    표+강한이김박스+라이트박스 생성 로직을 재사용 가능하게 분리. panel_id로 chart_id를
+    구분해서(예: chart-default-005930 vs chart-deep-005930) 두 패널이 같은 종목을 동시에
+    보여줄 때도 라이트박스 앵커가 서로 충돌하지 않게 한다."""
     strong_rows = [r for r in top_rows if r["score"] >= 2]
-    strong_count = len(strong_rows)
     rows_html = []
     lightboxes_html = []
     for i, r in enumerate(top_rows, 1):
         tier = _tier_of(r["score"])
         color, bg = TIER_COLOR[tier]
         yr_pos_html = f"{r['yr_pos']:.0f}%" if r["yr_pos"] is not None else "-"
-        chart_id = f"chart-{r['code']}"
+        chart_id = f"chart-{panel_id}-{r['code']}"
         detail_closes = r["recent_closes"][-DETAIL_CHART_DAYS:]
         panel_content = _detail_chart_svg(r) + _multi_threshold_svg(detail_closes)
         title = (f"{r['name']}({r['code']}) · 최근 구간 · "
@@ -668,14 +683,10 @@ def render_html(top_rows, total_candidates):
       <td style="text-align:right;">{r['cur_price']:,.0f}</td>
     </tr>''')
 
-    # 2026-09-04 사용자 요청("≥2점 인종목 해당하는 종목을 상위에 박스를 치고 박스안에 넣어줘")
-    # -- 이미 정렬(-score, -depth_pct)상 강한이김이 표 맨 위에 오긴 하지만, 사용자가 원한 건
-    # "확정률 신뢰 가능"으로 구분된 신호를 표와 별개로 눈에 띄게 박스로 뽑아 페이지 최상단에
-    # 두는 것 -- 72.8%/+0.49%(실측)가 적용되는 종목만 한눈에 보이게.
     strong_items_html = []
     for r in strong_rows:
         color, bg = TIER_COLOR["강한이김"]
-        chart_id = f"chart-{r['code']}"
+        chart_id = f"chart-{panel_id}-{r['code']}"
         strong_items_html.append(f'''<a href="#{chart_id}" class="strong-item">
           <span class="strong-item-top">
             <span class="strong-item-name">{r['name']}</span>
@@ -684,15 +695,63 @@ def render_html(top_rows, total_candidates):
           </span>
           <span class="strong-item-sub">되돌림 {r['depth_pct']:.1f}%p · 하락다리 {r['leg_days']}일째 · {r['cur_price']:,.0f}원</span>
         </a>''')
+    stat = STAT_BY_DEPTH.get(min_depth, {"reach": None, "avg": None, "n": "?"})
+    stat_txt = (f"5일 도달률 {stat['reach']:.1f}% · 평균 {stat['avg']:+.2f}% (2,700종목/n={stat['n']} 검증)"
+                if stat["reach"] is not None else "검증치 준비중")
     strong_box_html = f'''<div class="strong-box">
       <div class="strong-box-title">🟢 강한이김(저울점수 ≥2점) -- 실측상 신뢰 가능한 신호
-        <span class="strong-box-stat">5일 도달률 72.8% · 평균 +0.49% (2,700종목/n=77,750 검증)</span>
+        <span class="strong-box-stat">{stat_txt}</span>
       </div>
       <div class="strong-box-grid">{"".join(strong_items_html)}</div>
     </div>''' if strong_rows else (
         '<div class="strong-box strong-box-empty">🟢 강한이김(≥2점) 신호 -- 오늘은 해당 종목 없음'
         '</div>'
     )
+
+    base_date = top_rows[0]["last_date"].date() if top_rows else "-"
+    body = f'''<div class="sub">기준일 {base_date} · 하락다리(반등기대) 후보 {total_candidates}종목 중 상위 {len(top_rows)} ·
+    강한이김(≥2점) {len(strong_rows)}개</div>
+  {strong_box_html}
+  <div class="table-scroll">
+  <table>
+    <tr><th>#</th><th>종목명</th><th>코드</th><th>저울점수</th><th>시소</th><th>최근흐름</th>
+        <th>기간</th><th>다리등락%</th>
+        <th>되돌림깊이</th><th>52주위치</th><th style="text-align:right;">현재가</th></tr>
+    {"".join(rows_html)}
+  </table>
+  </div>'''
+    return body, "".join(lightboxes_html)
+
+
+def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
+    """2026-09-04 사용자 요청("사이트를 만들어서 거기서 볼 수 있게") -- GitHub Pages로 배포할
+    정적 HTML. V3/콜라 대시보드 계열과 같은 톤(단순 표+색 배지)으로 통일, 별도 프레임워크 없이
+    자체완결형 파일 하나.
+
+    2026-09-05 사용자 요청("저울에 15% 이상 버튼을 만드는건 어때?") -- deep_rows/deep_total을
+    넘기면 "전체(2%+)"/"깊은눌림(15%+)" 두 탭을 CSS만으로(라디오버튼+:checked, 기존
+    라이트박스와 같은 무자바스크립트 원칙) 전환할 수 있게 만든다. 안 넘기면(None) 기존처럼
+    탭 없이 단일 화면 -- 호출부(테스트 등) 하위호환 유지."""
+    regime_html = _regime_badge_html(_load_kospi_regime())
+    default_body, default_lightboxes = _candidates_panel_html(top_rows, total_candidates, "d", MIN_DEPTH)
+
+    tabs_html = ""
+    deep_body = deep_lightboxes = ""
+    if deep_rows is not None:
+        deep_body, deep_lightboxes = _candidates_panel_html(deep_rows, deep_total, "deep", 15.0)
+        # 2026-09-05 -- CSS :checked ~ 형제선택자는 "같은 부모 밑의 형제"에만 걸리므로, 라디오
+        # 버튼과 두 패널을 전부 같은 레벨(depth-tabs 바로 아래)에 나란히 둬야 한다(라이트박스의
+        # :target 패턴과 같은 무자바스크립트 원칙, 대신 부모-자식 구조를 한 단만 맞추면 됨).
+        tabs_html = f'''<div class="depth-tabs">
+      <input type="radio" name="depth-tab" id="tab-default" class="depth-tab-input" checked>
+      <input type="radio" name="depth-tab" id="tab-deep" class="depth-tab-input">
+      <div class="depth-tab-bar">
+        <label for="tab-default" class="depth-tab-label">전체(고점대비 2%+ 눌림)</label>
+        <label for="tab-deep" class="depth-tab-label">깊은눌림(15%+ 눌림)</label>
+      </div>
+      <div class="depth-panel depth-panel-default">{default_body}</div>
+      <div class="depth-panel depth-panel-deep">{deep_body}</div>
+    </div>'''
 
     return f'''<!doctype html>
 <html lang="ko"><head>
@@ -753,39 +812,47 @@ def render_html(top_rows, total_candidates):
   .zz-lightbox-close {{ position:absolute; top:10px; right:14px; font-size:20px; line-height:1;
                          color:#898781; text-decoration:none; }}
   .zz-lightbox-close:hover {{ color:#1c1d1f; }}
+  .depth-tabs {{ margin-bottom: 4px; }}
+  .depth-tab-input {{ position:absolute; opacity:0; pointer-events:none; }}
+  .depth-tab-bar {{ display:flex; gap:6px; margin-bottom:4px; }}
+  .depth-tab-label {{ cursor:pointer; padding:6px 14px; border-radius:8px 8px 0 0;
+                       font-size:13px; font-weight:600; color:#898781; background:#efeee7;
+                       border:1px solid #e5e3dc; border-bottom:none; }}
+  .depth-panel {{ display:none; }}
+  #tab-default:checked ~ .depth-tab-bar label[for="tab-default"],
+  #tab-deep:checked ~ .depth-tab-bar label[for="tab-deep"] {{
+    color:#1c1d1f; background:#fff; }}
+  #tab-default:checked ~ .depth-panel-default,
+  #tab-deep:checked ~ .depth-panel-deep {{ display:block; }}
 </style>
 </head><body>
   <h1>⚖ 저울 -- 코스피+코스닥 상위 {len(top_rows)}</h1>
-  <div class="sub">기준일 {base_date} · 하락다리(반등기대) 후보 {total_candidates}종목 중 상위 {len(top_rows)} ·
-    강한이김(≥2점) {strong_count}개</div>
   {regime_html}
-  {strong_box_html}
-  <div class="table-scroll">
-  <table>
-    <tr><th>#</th><th>종목명</th><th>코드</th><th>저울점수</th><th>시소</th><th>최근흐름</th>
-        <th>기간</th><th>다리등락%</th>
-        <th>되돌림깊이</th><th>52주위치</th><th style="text-align:right;">현재가</th></tr>
-    {"".join(rows_html)}
-  </table>
-  </div>
+  {tabs_html if deep_rows is not None else f'<div class="depth-panel" style="display:block;">{default_body}</div>'}
   <div class="note">
-    ≥2점(강한이김)만 실측상 신뢰할 수 있는 신호입니다(도달률 72.8%/평균 +0.49%) -- 1점 이하는
-    평균이 오히려 마이너스였습니다. 매일 17:10(KST) 자동 갱신됩니다.
+    ≥2점(강한이김)만 실측상 신뢰할 수 있는 신호입니다 -- 문턱(2%/15%)별 실측 도달률·평균수익은
+    각 탭의 초록 박스에 표시됩니다. 1점 이하는 평균이 오히려 마이너스였습니다. 매일 17:10(KST)
+    자동 갱신됩니다.
     <br>공식 검증 근거: <a href="https://github.com/riskmgr12345-beop/scale-project">scale-project 저장소</a>
   </div>
   {_verification_section_html()}
-  {"".join(lightboxes_html)}
+  {default_lightboxes}
+  {deep_lightboxes}
 </body></html>'''
 
 
 if __name__ == "__main__":
-    top_rows, total = build_report()
+    cache, name_to_code = _load_cache_and_names()
+    top_rows, total = build_report(cache, name_to_code, min_depth=MIN_DEPTH)
+    # 2026-09-05 사용자 요청("저울에 15% 이상 버튼을 만드는건 어때?") -- 오늘 검증한 깊은눌림
+    # 문턱(15%)을 같은 캐시로 한 번 더 계산해서 탭으로 같이 보여준다.
+    deep_rows, deep_total = build_report(cache, name_to_code, min_depth=15.0)
 
     # 2026-09-04 사용자 요청("오늘 추천종목... 다리넘은 종목 계속 결과 추적?") -- 오늘 새로
     # 뽑힌 강한이김 종목을 검증추적 트래커에 심는다(네트워크 불필요, seed만). 실제 진행상황
     # 갱신(FinanceDataReader 필요)은 별도 GHA(refresh_verification_tracker.yml)가 매일 담당 --
     # 여기서 하지 않는 이유는 클라우드 라우틴 샌드박스에서 네트워크가 막혀 있기 때문(ZZ/콜라와
-    # 동일한 제약).
+    # 동일한 제약). 깊은눌림(15%) 탭은 아직 별도 추적 대상에 안 넣음(기본 탭만 추적).
     tracker = verification_tracker._load_tracker()
     added = verification_tracker.seed_from_top_rows(tracker, top_rows)
     verification_tracker._save_tracker(tracker)
@@ -796,5 +863,5 @@ if __name__ == "__main__":
     with open("scale_top15_report.txt", "w", encoding="utf-8") as f:
         f.write(text)
     with open("docs/index.html", "w", encoding="utf-8") as f:
-        f.write(render_html(top_rows, total))
+        f.write(render_html(top_rows, total, deep_rows, deep_total))
     print(text)
