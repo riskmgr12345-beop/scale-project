@@ -91,6 +91,14 @@ def _market_status_badge_html(code, dart_cache):
     return f'<span class="market-status-badge">{" · ".join(parts)}</span>'
 
 
+def _high_vol_badge_html(high_vol):
+    """2026-09-05 -- ⑥ZZ '고변동' 부스터 배지. DART/관리종목 배지와 달리 리스크가 아니라
+    "이 터치가 통계적으로 더 믿을만한 신호"라는 긍정적 정보라 색을 초록 계열로 구분."""
+    if not high_vol:
+        return ""
+    return '<span class="high-vol-badge" title="이 종목 평소 변동폭 대비 오늘 되돌림이 더 큼(재검증 재현됨)">⚡고변동</span>'
+
+
 def _disclosure_html(code, dart_cache):
     """2026-09-05 사용자 요청("이어해" -- ②최근 60일 공시 화면표시) -- 콜라
     render_dashboard.py의 _disclosure_html과 같은 톤. 확대차트 라이트박스 안에 같이 넣어서
@@ -298,6 +306,26 @@ def zz_extra_score(vr, fast_rev):
     return score
 
 
+MIN_RANGE_SAMPLE_DAYS = 60
+
+
+def _is_high_volatility_touch(highs, lows, closes, depth_pct):
+    """2026-09-05 사용자 요청("순서대로 시작해") ⑥ZZ 나머지 부스터 중 "고변동"(종목별 변동성
+    정규화) 포팅. ZZ가 49종목/8년으로 검증한 정의(그 종목의 평소 평균 일일변동폭(고가-저가/종가)
+    대비 오늘 터치 깊이가 1.0배 이상)를 저울 2,700종목 모집단(n=13,932)에 순수분리로 재검증
+    (`vol_boost_test.py`)한 결과 재현됨 -- 전반부 78.8%/+1.45% vs plain 74.0%/+0.79%, 후반부
+    71.7%/+0.63% vs plain 70.1%/+0.06%, 양쪽 다 방향 일치. (더블바텀 부스터는 같은 방식으로
+    검증했으나 시기분할에서 방향이 뒤집혀 기각됨 -- README 참고.) 오늘(마지막 행) 자체는
+    평균 계산에서 제외해 룩어헤드를 막는다(과거 데이터만으로 "평소" 변동폭을 정의)."""
+    vals = [(h - l) / c * 100 for h, l, c in zip(highs[:-1], lows[:-1], closes[:-1]) if c]
+    if len(vals) < MIN_RANGE_SAMPLE_DAYS or depth_pct is None:
+        return False
+    avg_range = sum(vals) / len(vals)
+    if not avg_range:
+        return False
+    return (depth_pct / avg_range) >= 1.0
+
+
 def year_range_position_pct(closes, highs, lows):
     window = min(len(closes), 252)
     yr_high = max(highs[-window:])
@@ -393,6 +421,7 @@ def build_report(cache=None, name_to_code=None, min_depth=MIN_DEPTH):
         score = max(-5, min(5, extra - (TUG_OF_WAR_RISK_PENALTY if risk_flag else 0)))
 
         yr_pos = year_range_position_pct(closes, highs, lows)
+        high_vol = _is_high_volatility_touch(highs, lows, closes, depth_pct)
 
         rows.append({
             "name": name, "code": name_to_code.get(name, "-"), "score": score,
@@ -400,6 +429,7 @@ def build_report(cache=None, name_to_code=None, min_depth=MIN_DEPTH):
             "leg_days": pos["leg_days"], "leg_start_date": pos["leg_start_date"],
             "depth_pct": depth_pct, "cur_price": entry_price,
             "yr_pos": yr_pos, "risk_flag": risk_flag, "vr": vr, "fast_rev": fast_rev,
+            "high_vol": high_vol,
             "last_date": dates_idx[-1], "recent_closes": closes[-SPARKLINE_DAYS:],
             "recent_dates": list(dates_idx[-SPARKLINE_DAYS:]), "recent_lows": lows[-SPARKLINE_DAYS:],
         })
@@ -735,6 +765,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
         yr_pos_html = f"{r['yr_pos']:.0f}%" if r["yr_pos"] is not None else "-"
         dart_badge = _dart_badge_html(r["code"], dart_cache)
         market_badge = _market_status_badge_html(r["code"], dart_cache)
+        high_vol_badge = _high_vol_badge_html(r.get("high_vol"))
         chart_id = f"chart-{panel_id}-{r['code']}"
         detail_closes = r["recent_closes"][-DETAIL_CHART_DAYS:]
         panel_content = (_detail_chart_svg(r) + _multi_threshold_svg(detail_closes)
@@ -744,7 +775,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
         lightboxes_html.append(_chart_lightbox_html(chart_id, title, panel_content))
         rows_html.append(f'''<tr>
       <td>{i}</td>
-      <td style="font-weight:700;">{r['name']}{dart_badge}{market_badge}</td>
+      <td style="font-weight:700;">{r['name']}{dart_badge}{market_badge}{high_vol_badge}</td>
       <td style="color:#898781;font-variant-numeric:tabular-nums;">{r['code']}</td>
       <td><span style="color:{color};background:{bg};border-radius:6px;padding:2px 8px;font-weight:700;">
           {r['score']:+d} {tier}</span></td>
@@ -765,6 +796,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
         chart_id = f"chart-{panel_id}-{r['code']}"
         item_dart_badge = _dart_badge_html(r["code"], dart_cache)
         item_market_badge = _market_status_badge_html(r["code"], dart_cache)
+        item_high_vol_badge = _high_vol_badge_html(r.get("high_vol"))
         strong_items_html.append(f'''<a href="#{chart_id}" class="strong-item">
           <span class="strong-item-top">
             <span class="strong-item-name">{r['name']}</span>
@@ -774,6 +806,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
           <span class="strong-item-sub">되돌림 {r['depth_pct']:.1f}%p · 하락다리 {r['leg_days']}일째 · {r['cur_price']:,.0f}원</span>
           {f'<span class="strong-item-dart">{item_dart_badge}</span>' if item_dart_badge else ''}
           {f'<span class="strong-item-dart">{item_market_badge}</span>' if item_market_badge else ''}
+          {f'<span class="strong-item-dart">{item_high_vol_badge}</span>' if item_high_vol_badge else ''}
         </a>''')
     stat = STAT_BY_DEPTH.get(min_depth, {"reach": None, "avg": None, "n": "?"})
     stat_txt = (f"5일 도달률 {stat['reach']:.1f}% · 평균 {stat['avg']:+.2f}% (2,700종목/n={stat['n']} 검증)"
@@ -918,6 +951,8 @@ def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
                   color:#a05a1a; background:#fbeed8; border-radius:5px; padding:1px 6px; }}
   .market-status-badge {{ display:inline-block; margin-left:6px; font-size:10.5px; font-weight:700;
                   color:#5a5650; background:#f0efe9; border-radius:5px; padding:1px 6px; }}
+  .high-vol-badge {{ display:inline-block; margin-left:6px; font-size:10.5px; font-weight:700;
+                  color:#0a7a4a; background:#e3f5ea; border-radius:5px; padding:1px 6px; }}
   .strong-item-dart {{ display:block; margin-top:4px; }}
   .safe-box {{ border-color:#0a8a3c; }}
   .disclosure-box {{ margin-top:10px; padding:8px 10px; background:#f7f6f2; border:1px solid #e5e3dc;
