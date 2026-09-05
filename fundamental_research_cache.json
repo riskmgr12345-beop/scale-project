@@ -1,0 +1,87 @@
+{
+  "084110": {
+    "updated_at": "2026-09-05T09:00:00+00:00",
+    "name": "휴온스글로벌",
+    "verdict": "neutral",
+    "summary": "자회사 휴메딕스는 견조(2Q26 매출 +17.3%, 영업이익 +8.2%)하나, 연결 영업이익은 2025년 -6.6%로 소폭 감소. 순이익은 +20.2%로 개선.",
+    "sources": [
+      {"title": "휴온스글로벌, 2025년 매출 8475억…역대 최대 실적", "url": "https://v.daum.net/v/20260213172723369"},
+      {"title": "휴메딕스, 2026년 2분기 실적", "url": "https://www.medifonews.com/news/article.html?no=215558"}
+    ]
+  },
+  "314930": {
+    "updated_at": "2026-09-05T09:00:00+00:00",
+    "name": "바이오다인",
+    "verdict": "positive",
+    "summary": "로슈 로열티 매출 본격화 -- 2026년 매출 +65~70%, 영업이익 +639% 전망. 벤타나 SP400 40개국 확대 예정. 다만 PER 242배로 이미 고평가.",
+    "sources": [
+      {"title": "세계 1위 로슈에 로열티 받는다…바이오다인", "url": "https://www.asiae.co.kr/article/2024092616101995463"},
+      {"title": "바이오다인, 올해부터 흑자 행진", "url": "https://pharm.edaily.co.kr/News/Read?newsId=02571526642397536"}
+    ]
+  },
+  "251370": {
+    "updated_at": "2026-09-05T09:00:00+00:00",
+    "name": "와이엠티",
+    "verdict": "positive",
+    "summary": "2025년 매출 +5.4%, 영업이익 +259%. 2026년도 성장 지속 전망(AI서버 기판·북미 스마트폰 수요 호조).",
+    "sources": [
+      {"title": "와이엠티, AI 서버용 기판 수요 호조 수혜 전망", "url": "http://www.dailyinvest.kr/news/articleView.html?idxno=70482"}
+    ]
+  },
+  "030530": {
+    "updated_at": "2026-09-05T09:00:00+00:00",
+    "name": "원익홀딩스",
+    "verdict": "watch",
+    "summary": "2025년 영업손실 4억(적자전환, 반도체장비 부진). 2026년 반도체 업황 개선 기대로 하반기 회복 전망 -- 아직 실적 반등 확인 전.",
+    "sources": [
+      {"title": "10배 오른 '원익'에 무슨 일? 하반기 반도체 반등 시도", "url": "https://www.newspim.com/news/view/20260212001355"}
+    ]
+  },
+  "263800": {
+    "updated_at": "2026-09-05T09:00:00+00:00",
+    "name": "데이타솔루션",
+    "verdict": "positive",
+    "summary": "대형 AI인프라(GPU서버) 수주 체결(2026.7~2031.12), 52주 신고가 경신 계기. PER 73.5배는 다소 부담.",
+    "sources": [
+      {"title": "데이타솔루션 52주 신고가 경신, AI인프라 구축 사업 계약", "url": "https://www.hankyung.com/article/202607094488L"}
+    ]
+  },
+  "053950": {
+    "updated_at": "2026-09-05T09:00:00+00:00",
+    "name": "경남제약",
+    "verdict": "negative",
+    "summary": "핵심 브랜드 레모나 매출 3년 연속 하락(2022년 201억→2025년 144억), 전체 매출 -8%, 영업손실 확대. 펫·주류 등 다각화 진행 중이나 아직 성과 미미.",
+    "sources": [
+      {"title": "경남제약, 잦은 수장 교체에도 반등 불투명", "url": "https://biz.newdaily.co.kr/site/data/html/2026/04/02/2026040200136.html"}
+    ]
+  },
+  "417310": {
+    "updated_at": "2026-09-05T09:00:00+00:00",
+    "name": "코람코더원리츠",
+    "verdict": "neutral",
+    "summary": "리츠(배당형 부동산신탁). 배당수익률 3.75~3.78%, 배당성향 491.67%(이익 대비 배당이 많음, 지속가능성 주의). 최근 자산 재평가로 반등 계기.",
+    "sources": [
+      {"title": "코람코더원리츠·한화리츠 동반 상승…자산 가치 재평가에 방긋", "url": "https://www.pinpointnews.co.kr/news/articleView.html?idxno=444121"}
+    ]
+  },
+  "243070": {
+    "updated_at": "2026-09-05T09:00:00+00:00",
+    "name": "휴온스",
+    "verdict": "watch",
+    "summary": "1분기 FDA 통관보류로 적자, 2분기 흑자전환(+29억)했으나 FDA 재실사는 올해 말, 미국 수출 재개 목표는 2027년 초 -- 펀더멘털 정상화까지 아직 시간 필요.",
+    "sources": [
+      {"title": "휴온스, 1분기 적자 전환…FDA 통관 보류", "url": "https://www.insightkorea.co.kr/news/articleView.html?idxno=246304"},
+      {"title": "2026 2분기 실적, 휴온스 영업이익 29억…전분기 대비 흑자 전환", "url": "https://www.inthenews.co.kr/news/article.html?no=90403"}
+    ]
+  },
+  "475560": {
+    "updated_at": "2026-09-05T09:00:00+00:00",
+    "name": "더본코리아",
+    "verdict": "negative",
+    "summary": "2025년 매출 -22.2%, 영업이익 237억 적자전환. 식품위생법 위반·원산지표시·과장광고 논란 다수, 가맹점 신뢰 하락. 공모가(34,000원) 대비 주가 반토막 이하.",
+    "sources": [
+      {"title": "더본코리아, 상장 후 1년 못버티고 결국 적자", "url": "https://www.datanews.co.kr/news/article.html?no=144263"},
+      {"title": "'논란·적자 위기' 더본코리아, 신뢰 추락", "url": "https://www.seoulfn.com/news/articleView.html?idxno=624584"}
+    ]
+  }
+}

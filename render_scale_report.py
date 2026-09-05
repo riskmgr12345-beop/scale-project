@@ -42,6 +42,7 @@ def _load_kospi_regime():
 
 
 DART_RISK_CACHE_PATH = "dart_risk_cache.json"
+FUNDAMENTAL_RESEARCH_CACHE_PATH = "fundamental_research_cache.json"
 
 
 def _load_dart_risk_cache():
@@ -66,6 +67,64 @@ def _dart_badge_html(code, dart_cache):
     reason = cap.get("reason") or "재무 경고"
     return (f'<span class="dart-badge" title="DART 재무제표 기반 선행경고, '
             f'공식 관리종목 지정과는 별개">💸 {reason}</span>')
+
+
+def _load_fundamental_research_cache():
+    """2026-09-05 사용자 요청("안전박스 종목은 다방면으로 검토" -> "클라우드 라우틴도 검토")
+    -- 별도 클라우드 라우틴("저울 안전박스 펀더멘털 리서치")이 매일 저울 리포트 갱신 직후
+    안전박스 종목별로 웹서치(최근 실적/뉴스/리스크)를 수행해 이 캐시를 갱신한다. DART/시장
+    상태 캐시와 같은 읽기전용 패턴 -- 캐시가 없거나 특정 종목이 아직 없으면 조용히 생략,
+    리포트 생성 자체는 막지 않는다."""
+    try:
+        with open(FUNDAMENTAL_RESEARCH_CACHE_PATH, encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+VERDICT_STYLE = {
+    "positive": ("#0a8a3c", "#e3f5ea", "🟢 긍정적"),
+    "watch": ("#a05818", "#fbeed8", "🟡 개선중·리스크有"),
+    "negative": ("#c0392b", "#fbe4e1", "🔴 펀더멘털 약함"),
+    "neutral": ("#5a5650", "#f0efe9", "⚪ 중립"),
+}
+
+
+def _fundamental_research_section_html(safe_rows, cache):
+    """안전박스(강한이김+재무경고없음) 종목들에 대한 클라우드 라우틴의 펀더멘털 리서치 요약을
+    별도 섹션으로 표시. 저울의 점수는 순수 가격·거래량 패턴이라 회사 자체의 실제 상태(실적
+    개선 중인지, 스캔들이 있는지 등)는 못 보므로, 이 섹션이 그 공백을 보완한다."""
+    if not safe_rows:
+        return ""
+    cards = []
+    for r in safe_rows:
+        entry = cache.get(r["code"])
+        if not entry:
+            cards.append(f'''<div class="fund-card fund-card-pending">
+              <div class="fund-card-name">{r['name']} <span class="fund-card-code">{r['code']}</span></div>
+              <div class="fund-card-summary">리서치 대기중(다음 갱신 때 반영)</div>
+            </div>''')
+            continue
+        color, bg, label = VERDICT_STYLE.get(entry.get("verdict"), VERDICT_STYLE["neutral"])
+        sources_html = "".join(
+            f'<a href="{s["url"]}" target="_blank" rel="noopener">{s["title"]}</a>'
+            for s in (entry.get("sources") or [])[:4]
+        )
+        updated = (entry.get("updated_at") or "")[:10]
+        cards.append(f'''<div class="fund-card">
+          <div class="fund-card-name">{r['name']} <span class="fund-card-code">{r['code']}</span>
+            <span class="fund-card-verdict" style="color:{color};background:{bg};">{label}</span>
+          </div>
+          <div class="fund-card-summary">{entry.get('summary','')}</div>
+          {f'<div class="fund-card-sources">{sources_html}</div>' if sources_html else ''}
+          {f'<div class="fund-card-updated">{updated} 리서치</div>' if updated else ''}
+        </div>''')
+    return f'''<div class="fund-section">
+      <div class="fund-section-title">📰 안전박스 펀더멘털 리서치
+        <span class="fund-section-stat">저울 점수는 가격·거래량 패턴만 봄 -- 회사 자체 상태는 별도 확인 필요</span>
+      </div>
+      <div class="fund-section-grid">{"".join(cards)}</div>
+    </div>'''
 
 
 def _market_status_badge_html(code, dart_cache):
@@ -854,10 +913,14 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
       <div class="strong-box-grid">{"".join(safe_items_html)}</div>
     </div>''' if strong_rows else ""
 
+    fundamental_cache = _load_fundamental_research_cache()
+    fund_section_html = _fundamental_research_section_html(safe_rows, fundamental_cache)
+
     base_date = top_rows[0]["last_date"].date() if top_rows else "-"
     body = f'''<div class="sub">기준일 {base_date} · 하락다리(반등기대) 후보 {total_candidates}종목 중 상위 {len(top_rows)} ·
     강한이김(≥2점) {len(strong_rows)}개</div>
   {safe_box_html}
+  {fund_section_html}
   {strong_box_html}
   <div class="table-scroll">
   <table>
@@ -953,6 +1016,21 @@ def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
                   color:#5a5650; background:#f0efe9; border-radius:5px; padding:1px 6px; }}
   .high-vol-badge {{ display:inline-block; margin-left:6px; font-size:10.5px; font-weight:700;
                   color:#0a7a4a; background:#e3f5ea; border-radius:5px; padding:1px 6px; }}
+  .fund-section {{ margin:14px 0; padding:14px 16px; background:#fbfaf7; border:1px solid #e5e3dc;
+                    border-radius:10px; }}
+  .fund-section-title {{ font-weight:700; font-size:13.5px; color:#3d3550; margin-bottom:10px; }}
+  .fund-section-stat {{ display:block; font-weight:400; font-size:11px; color:#898781; margin-top:2px; }}
+  .fund-section-grid {{ display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:10px; }}
+  .fund-card {{ padding:10px 12px; background:#fff; border:1px solid #e5e3dc; border-radius:8px; }}
+  .fund-card-pending {{ color:#898781; font-size:11.5px; }}
+  .fund-card-name {{ font-weight:700; font-size:12.5px; margin-bottom:4px; }}
+  .fund-card-code {{ color:#898781; font-weight:400; font-size:10.5px; }}
+  .fund-card-verdict {{ display:inline-block; margin-left:6px; font-size:10px; font-weight:700;
+                         border-radius:5px; padding:1px 6px; }}
+  .fund-card-summary {{ font-size:11.5px; color:#52514e; line-height:1.6; margin-bottom:6px; }}
+  .fund-card-sources {{ display:flex; flex-wrap:wrap; gap:6px; font-size:10px; }}
+  .fund-card-sources a {{ color:#5b3fa0; }}
+  .fund-card-updated {{ font-size:10px; color:#b3b0a6; margin-top:4px; }}
   .strong-item-dart {{ display:block; margin-top:4px; }}
   .safe-box {{ border-color:#0a8a3c; }}
   .disclosure-box {{ margin-top:10px; padding:8px 10px; background:#f7f6f2; border:1px solid #e5e3dc;
