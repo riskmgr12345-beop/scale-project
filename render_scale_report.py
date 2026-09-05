@@ -41,7 +41,12 @@ def _load_kospi_regime():
         return None
 
 THRESHOLD = 0.03
-MIN_DEPTH = 2.0  # 상위 15개를 뽑는 용도라 문턱을 낮게 잡아 후보군을 넓게 본다(2%p+)
+# 2026-09-05 사용자 요청("저울1 자체를 2%->10%로 바꾸고 탭 하나로 통일해줘") -- 원래 2.0%는
+# "후보군을 넓게 본 뒤 점수로 거른다"는 취지로 최초 커밋(52d48c7)부터 있던 값인데, 검증(원래
+# scale_validation_test.py의 7%)과 헷갈린다는 사용자 지적 + 10%가 시기분할 재현성 있게
+# 확률/수익 둘 다 개선됨을 실측 확인(72.8%->73.7%, +0.49%->+1.07%)한 뒤 이 값 자체를 10.0으로
+# 올리고 별도 탭 구조는 제거했다(2%+/10%+ 두 탭 실험은 이 커밋에서 되돌림).
+MIN_DEPTH = 10.0
 RISK_RECOVERY_MIN = 3.0
 TUG_OF_WAR_RISK_PENALTY = 3
 # 2026-09-04 -- 로컬 데스크톱(_상한가전조연구, 한글 폴더명)과 클라우드 라우틴(같이 클론되는
@@ -643,7 +648,6 @@ def _verification_section_html():
 
 
 STAT_BY_DEPTH = {
-    2.0: {"reach": 72.8, "avg": 0.49, "n": "77,750"},
     10.0: {"reach": 73.7, "avg": 1.07, "n": "12,695"},
 }
 
@@ -830,9 +834,9 @@ def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
   {regime_html}
   {tabs_html if deep_rows is not None else f'<div class="depth-panel" style="display:block;">{default_body}</div>'}
   <div class="note">
-    ≥2점(강한이김)만 실측상 신뢰할 수 있는 신호입니다 -- 문턱(2%/10%)별 실측 도달률·평균수익은
-    각 탭의 초록 박스에 표시됩니다. 1점 이하는 평균이 오히려 마이너스였습니다. 매일 17:10(KST)
-    자동 갱신됩니다.
+    ≥2점(강한이김)만 실측상 신뢰할 수 있는 신호입니다(고점대비 10%p+ 눌림 기준, 도달률
+    73.7%/평균 +1.07%, 2,700종목/n=12,695 검증) -- 1점 이하는 평균이 오히려 마이너스였습니다.
+    매일 17:10(KST) 자동 갱신됩니다.
     <br>공식 검증 근거: <a href="https://github.com/riskmgr12345-beop/scale-project">scale-project 저장소</a>
   </div>
   {_verification_section_html()}
@@ -844,16 +848,16 @@ def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
 if __name__ == "__main__":
     cache, name_to_code = _load_cache_and_names()
     top_rows, total = build_report(cache, name_to_code, min_depth=MIN_DEPTH)
-    # 2026-09-05 사용자 요청("저울에 15% 이상 버튼을 만드는건 어때?" -> 이후 "저울도 10%
-    # 이상으로 해줘"로 문턱 조정, 10%가 시기분할 재현성이 15%보다 더 안정적이었던 게 근거) --
-    # 오늘 검증한 깊은눌림 문턱(10%)을 같은 캐시로 한 번 더 계산해서 탭으로 같이 보여준다.
-    deep_rows, deep_total = build_report(cache, name_to_code, min_depth=10.0)
+    # 2026-09-05 사용자 요청 흐름: "저울에 15% 이상 버튼" -> "10%로" -> "2%/10% 탭 헷갈리니
+    # 저울1 자체를 10%로 바꾸고 탭 하나로 통일해줘" -- 두 탭 실험(deep_rows 별도 계산)은
+    # 되돌리고, MIN_DEPTH 자체를 10.0으로 올려서 단일 화면으로 되돌렸다. render_html의
+    # deep_rows 인자는 그대로 두되(향후 재사용 가능하게) 여기서는 넘기지 않는다.
 
     # 2026-09-04 사용자 요청("오늘 추천종목... 다리넘은 종목 계속 결과 추적?") -- 오늘 새로
     # 뽑힌 강한이김 종목을 검증추적 트래커에 심는다(네트워크 불필요, seed만). 실제 진행상황
     # 갱신(FinanceDataReader 필요)은 별도 GHA(refresh_verification_tracker.yml)가 매일 담당 --
     # 여기서 하지 않는 이유는 클라우드 라우틴 샌드박스에서 네트워크가 막혀 있기 때문(ZZ/콜라와
-    # 동일한 제약). 깊은눌림(15%) 탭은 아직 별도 추적 대상에 안 넣음(기본 탭만 추적).
+    # 동일한 제약).
     tracker = verification_tracker._load_tracker()
     added = verification_tracker.seed_from_top_rows(tracker, top_rows)
     verification_tracker._save_tracker(tracker)
@@ -864,5 +868,5 @@ if __name__ == "__main__":
     with open("scale_top15_report.txt", "w", encoding="utf-8") as f:
         f.write(text)
     with open("docs/index.html", "w", encoding="utf-8") as f:
-        f.write(render_html(top_rows, total, deep_rows, deep_total))
+        f.write(render_html(top_rows, total))
     print(text)
