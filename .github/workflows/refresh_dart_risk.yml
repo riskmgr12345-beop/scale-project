@@ -10,6 +10,12 @@ name: 저울 DART 재무경고 갱신
 # 조회하면 API 부담이 크다. 클라우드 라우틴 샌드박스는 네트워크가 막혀 있어 이 스크립트를
 # 못 돌리므로(FinanceDataReader/kospi_regime과 동일한 제약) GHA가 대신 매일 담당한다.
 #
+# 2026-09-05(첫 수동실행 실패로 발견/수정) -- build_report()가 콜라 캐시(limitup_ohlcv_
+# cache.pkl)를 읽어야 하는데, 다른 두 워크플로(refresh_kospi_regime/refresh_verification_
+# tracker)는 이게 필요 없어서 몰랐던 문제: 이 저장소만 체크아웃하면 "../limitup-precursor-
+# research" 형제 폴더가 없어서 FileNotFoundError. 콜라 저장소도 같이 체크아웃(경로를 나란히
+# 지정)해서 해결.
+#
 # 필요 설정: 이 저장소(scale-project) Settings > Secrets and variables > Actions에
 # DART_API_KEY를 등록해야 함(opendart.fss.or.kr에서 발급).
 
@@ -25,20 +31,31 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout scale-project
+        uses: actions/checkout@v4
+        with:
+          path: scale-project
+
+      - name: Checkout limitup-precursor-research (콜라 캐시 읽기전용)
+        uses: actions/checkout@v4
+        with:
+          repository: riskmgr12345-beop/limitup-precursor-research
+          path: limitup-precursor-research
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - run: pip install -r requirements.txt
+      - run: pip install -r scale-project/requirements.txt
 
       - name: DART 재무경고 갱신
+        working-directory: scale-project
         env:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
         run: python dart_risk_check.py
 
       - name: 변경사항 커밋
+        working-directory: scale-project
         run: |
           git config user.name "scale-project-bot"
           git config user.email "bot@users.noreply.github.com"
