@@ -13,11 +13,16 @@ name: 저울 DART 재무경고 갱신
 # 2026-09-05(첫 수동실행 실패로 발견/수정) -- build_report()가 콜라 캐시(limitup_ohlcv_
 # cache.pkl)를 읽어야 하는데, 다른 두 워크플로(refresh_kospi_regime/refresh_verification_
 # tracker)는 이게 필요 없어서 몰랐던 문제: 이 저장소만 체크아웃하면 "../limitup-precursor-
-# research" 형제 폴더가 없어서 FileNotFoundError. 콜라 저장소도 같이 체크아웃(경로를 나란히
-# 지정)해서 해결.
+# research" 형제 폴더가 없어서 FileNotFoundError. 콜라 저장소도 같이 체크아웃해서 해결하려
+# 했으나, 콜라(limitup-precursor-research)가 비공개 저장소라 기본 GITHUB_TOKEN(이 저장소
+# 전용)으로는 접근 불가("Not Found") -- 별도 PAT(COLA_REPO_TOKEN 시크릿, repo 스코프)를
+# 발급받아 그 체크아웃 단계에만 지정해서 해결.
 #
 # 필요 설정: 이 저장소(scale-project) Settings > Secrets and variables > Actions에
-# DART_API_KEY를 등록해야 함(opendart.fss.or.kr에서 발급).
+# - DART_API_KEY (opendart.fss.or.kr에서 발급)
+# - COLA_REPO_TOKEN (github.com/settings/tokens에서 repo 스코프로 발급한 classic PAT --
+#   콜라 저장소가 비공개라 이 계정 소유의 다른 저장소를 체크아웃하려면 필요)
+# 둘 다 등록 필요.
 
 on:
   schedule:
@@ -36,11 +41,12 @@ jobs:
         with:
           path: scale-project
 
-      - name: Checkout limitup-precursor-research (콜라 캐시 읽기전용)
+      - name: Checkout limitup-precursor-research (콜라 캐시 읽기전용, 비공개라 PAT 필요)
         uses: actions/checkout@v4
         with:
           repository: riskmgr12345-beop/limitup-precursor-research
           path: limitup-precursor-research
+          token: ${{ secrets.COLA_REPO_TOKEN }}
 
       - uses: actions/setup-python@v5
         with:
