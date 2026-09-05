@@ -746,8 +746,8 @@ def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
       <input type="radio" name="depth-tab" id="tab-default" class="depth-tab-input" checked>
       <input type="radio" name="depth-tab" id="tab-deep" class="depth-tab-input">
       <div class="depth-tab-bar">
-        <label for="tab-default" class="depth-tab-label">전체(고점대비 2%+ 눌림)</label>
-        <label for="tab-deep" class="depth-tab-label">깊은눌림(10%+ 눌림)</label>
+        <label for="tab-default" class="depth-tab-label">저울1 · 전체(고점대비 2%+ 눌림)</label>
+        <label for="tab-deep" class="depth-tab-label">저울2 · 깊은눌림(10%+ 눌림)</label>
       </div>
       <div class="depth-panel depth-panel-default">{default_body}</div>
       <div class="depth-panel depth-panel-deep">{deep_body}</div>
