@@ -7,15 +7,15 @@
 
 이번 버전에서 포함한 것: 방향(상승/하락다리), 진행기간, 등락%, 저울점수(부스터-위험신호),
 52주 가격위치(캐시 히스토리로 직접 계산 가능).
-이번 버전에서 제외한 것(추가 데이터소스 필요, 후속 작업): 수급(투자자별매매동향)·PER·관리종목
-여부 -- 이 캐시엔 OHLCV만 있고 재무/투자자 데이터가 없어서, V3의 "객관가치" 배지처럼 전부
-넣으려면 별도 데이터소스(DART, KRX 관리종목 리스트 등)를 새로 연결해야 한다.
+2026-09-05(③ 포팅 완료로 갱신) -- 수급(투자자별매매동향)은 여전히 제외 상태(KRX API 접근이
+막혀 보류, README 참고). PER·관리종목 여부는 dart_risk_check.py가 FinanceDataReader의 Dept
+컬럼 + DART 당기순이익으로 계산해 이미 포함됨(_market_status_badge_html).
 """
+import html
 import json
 import os
 import pickle
 import statistics
-from datetime import datetime
 
 import verification_tracker
 
@@ -101,21 +101,29 @@ def _fundamental_research_section_html(safe_rows, cache):
         entry = cache.get(r["code"])
         if not entry:
             cards.append(f'''<div class="fund-card fund-card-pending">
-              <div class="fund-card-name">{r['name']} <span class="fund-card-code">{r['code']}</span></div>
+              <div class="fund-card-name">{html.escape(r['name'])} <span class="fund-card-code">{html.escape(r['code'])}</span></div>
               <div class="fund-card-summary">리서치 대기중(다음 갱신 때 반영)</div>
             </div>''')
             continue
         color, bg, label = VERDICT_STYLE.get(entry.get("verdict"), VERDICT_STYLE["neutral"])
+        # 2026-09-05 정밀분석 -- 이 캐시는 클라우드 라우틴이 WebSearch로 읽은 외부 웹 콘텐츠
+        # (기사 제목/URL/요약)를 그대로 받아쓴다. 이스케이프 없이 f-string으로 바로 HTML에
+        # 꽂으면, 기사 제목에 &/</> 같은 문자가 섞여 들어올 때 사이트 레이아웃이 깨지거나
+        # (의도치 않게라도) 삽입된 마크업이 그대로 렌더링될 수 있다 -- html.escape로 방어.
         sources_html = "".join(
-            f'<a href="{s["url"]}" target="_blank" rel="noopener">{s["title"]}</a>'
+            f'<a href="{html.escape(s.get("url", ""), quote=True)}" target="_blank" rel="noopener">'
+            f'{html.escape(s.get("title", ""))}</a>'
             for s in (entry.get("sources") or [])[:4]
         )
-        updated = (entry.get("updated_at") or "")[:10]
+        updated = html.escape((entry.get("updated_at") or "")[:10])
+        summary_safe = html.escape(entry.get("summary", ""))
+        card_name = html.escape(r["name"])
+        card_code = html.escape(r["code"])
         cards.append(f'''<div class="fund-card">
-          <div class="fund-card-name">{r['name']} <span class="fund-card-code">{r['code']}</span>
+          <div class="fund-card-name">{card_name} <span class="fund-card-code">{card_code}</span>
             <span class="fund-card-verdict" style="color:{color};background:{bg};">{label}</span>
           </div>
-          <div class="fund-card-summary">{entry.get('summary','')}</div>
+          <div class="fund-card-summary">{summary_safe}</div>
           {f'<div class="fund-card-sources">{sources_html}</div>' if sources_html else ''}
           {f'<div class="fund-card-updated">{updated} 리서치</div>' if updated else ''}
         </div>''')
@@ -952,6 +960,15 @@ def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
     탭 없이 단일 화면 -- 호출부(테스트 등) 하위호환 유지."""
     regime_html = _regime_badge_html(_load_kospi_regime())
     default_body, default_lightboxes = _candidates_panel_html(top_rows, total_candidates, "d", MIN_DEPTH)
+    # 2026-09-05 정밀분석 -- 이 note가 STAT_BY_DEPTH의 수치를 별도로 하드코딩하고 있었다
+    # (73.7%/1.07%/12,695를 문자열로 직접 적어둠). MIN_DEPTH 스윕 값이 바뀔 때(예: 2%->10%
+    # 전환 때처럼) 이 note를 고치는 걸 깜빡하면 화면에 낡은 검증수치가 남는 위험이 있어서,
+    # _candidates_panel_html의 strong-box와 같은 STAT_BY_DEPTH 딕셔너리를 그대로 참조하도록
+    # 통일한다(단일 소스).
+    _main_stat = STAT_BY_DEPTH.get(MIN_DEPTH, {"reach": None, "avg": None, "n": "?"})
+    main_stat_txt = (f"도달률 {_main_stat['reach']:.1f}%/평균 {_main_stat['avg']:+.2f}%, "
+                      f"2,700종목/n={_main_stat['n']} 검증"
+                      if _main_stat["reach"] is not None else "검증치 준비중")
 
     tabs_html = ""
     deep_body = deep_lightboxes = ""
@@ -1074,8 +1091,8 @@ def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
   {regime_html}
   {tabs_html if deep_rows is not None else f'<div class="depth-panel" style="display:block;">{default_body}</div>'}
   <div class="note">
-    ≥2점(강한이김)만 실측상 신뢰할 수 있는 신호입니다(고점대비 10%p+ 눌림 기준, 도달률
-    73.7%/평균 +1.07%, 2,700종목/n=12,695 검증) -- 1점 이하는 평균이 오히려 마이너스였습니다.
+    ≥2점(강한이김)만 실측상 신뢰할 수 있는 신호입니다(고점대비 {MIN_DEPTH:.0f}%p+ 눌림 기준,
+    {main_stat_txt}) -- 1점 이하는 평균이 오히려 마이너스였습니다.
     매일 17:10(KST) 자동 갱신됩니다.
     <br>공식 검증 근거: <a href="https://github.com/riskmgr12345-beop/scale-project">scale-project 저장소</a>
   </div>

@@ -37,5 +37,10 @@ jobs:
           git config user.name "scale-project-bot"
           git config user.email "bot@users.noreply.github.com"
           git add verification_tracker.json
-          git diff --cached --quiet || git commit -m "자동: 저울 검증추적 갱신 $(date -u +%Y-%m-%d)"
+          git diff --cached --quiet && exit 0
+          git commit -m "자동: 저울 검증추적 갱신 $(date -u +%Y-%m-%d)"
+          # 2026-09-05 정밀분석 -- 07:55~08:30 UTC 사이 자동 커밋 잡이 5개로 늘어나 서로 겹칠
+          # 위험이 커짐. 다른 파일만 건드리므로 rebase 충돌 없이 안전하게 최신 원격을 반영한
+          # 뒤 푸시.
+          git pull --rebase origin main
           git push
