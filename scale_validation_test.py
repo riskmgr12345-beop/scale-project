@@ -114,6 +114,20 @@ def zz_extra_score(vr, fast_rev):
     return score
 
 
+def _drop_zero_volume_days(closes, lows, volumes, dates):
+    """2026-09-04 뒤늦게 반영(README에 이미 "재검증 필요"로 남아있던 숙제) -- render_scale_report.py
+    는 엑사이엔씨 사례(거래정지일에 O=H=L=C 고정값+거래량0을 데이터공급사가 채워넣어 가짜
+    대폭락/급반등 터치를 만듦) 발견 이후 이 필터가 있었는데, 원래 검증 스크립트인 여기는 없었다.
+    사용자가 "거래정지 같이 리스크있는건 걸러내야지"라고 재확인 -- MIN_DEPTH 15%+ 스윕에서
+    거래정지 인접 터치(터치일 거래량0, 5일후 +900%/+373% 등 가짜값)가 상위권을 오염시키는 걸
+    직접 확인하고 나서야 여기도 고쳤다. 거래량<=0인 날을 시계열에서 통째로 제거."""
+    keep = [i for i, v in enumerate(volumes) if v and v > 0]
+    if len(keep) == len(volumes):
+        return closes, lows, volumes, dates
+    return ([closes[i] for i in keep], [lows[i] for i in keep],
+            [volumes[i] for i in keep], [dates[i] for i in keep])
+
+
 def summarize(rows):
     n = len(rows)
     if not n:
@@ -137,6 +151,7 @@ if __name__ == "__main__":
             dates_idx = df.index
         except Exception:
             continue
+        closes, lows, volumes, dates_idx = _drop_zero_volume_days(closes, lows, volumes, dates_idx)
         if len(closes) < 60:
             skipped_short += 1
             continue
