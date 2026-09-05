@@ -644,7 +644,7 @@ def _verification_section_html():
 
 STAT_BY_DEPTH = {
     2.0: {"reach": 72.8, "avg": 0.49, "n": "77,750"},
-    15.0: {"reach": 76.7, "avg": 2.24, "n": "7,149"},
+    10.0: {"reach": 73.7, "avg": 1.07, "n": "12,695"},
 }
 
 
@@ -738,7 +738,7 @@ def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
     tabs_html = ""
     deep_body = deep_lightboxes = ""
     if deep_rows is not None:
-        deep_body, deep_lightboxes = _candidates_panel_html(deep_rows, deep_total, "deep", 15.0)
+        deep_body, deep_lightboxes = _candidates_panel_html(deep_rows, deep_total, "deep", 10.0)
         # 2026-09-05 -- CSS :checked ~ 형제선택자는 "같은 부모 밑의 형제"에만 걸리므로, 라디오
         # 버튼과 두 패널을 전부 같은 레벨(depth-tabs 바로 아래)에 나란히 둬야 한다(라이트박스의
         # :target 패턴과 같은 무자바스크립트 원칙, 대신 부모-자식 구조를 한 단만 맞추면 됨).
@@ -747,7 +747,7 @@ def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
       <input type="radio" name="depth-tab" id="tab-deep" class="depth-tab-input">
       <div class="depth-tab-bar">
         <label for="tab-default" class="depth-tab-label">전체(고점대비 2%+ 눌림)</label>
-        <label for="tab-deep" class="depth-tab-label">깊은눌림(15%+ 눌림)</label>
+        <label for="tab-deep" class="depth-tab-label">깊은눌림(10%+ 눌림)</label>
       </div>
       <div class="depth-panel depth-panel-default">{default_body}</div>
       <div class="depth-panel depth-panel-deep">{deep_body}</div>
@@ -830,7 +830,7 @@ def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
   {regime_html}
   {tabs_html if deep_rows is not None else f'<div class="depth-panel" style="display:block;">{default_body}</div>'}
   <div class="note">
-    ≥2점(강한이김)만 실측상 신뢰할 수 있는 신호입니다 -- 문턱(2%/15%)별 실측 도달률·평균수익은
+    ≥2점(강한이김)만 실측상 신뢰할 수 있는 신호입니다 -- 문턱(2%/10%)별 실측 도달률·평균수익은
     각 탭의 초록 박스에 표시됩니다. 1점 이하는 평균이 오히려 마이너스였습니다. 매일 17:10(KST)
     자동 갱신됩니다.
     <br>공식 검증 근거: <a href="https://github.com/riskmgr12345-beop/scale-project">scale-project 저장소</a>
@@ -844,9 +844,10 @@ def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
 if __name__ == "__main__":
     cache, name_to_code = _load_cache_and_names()
     top_rows, total = build_report(cache, name_to_code, min_depth=MIN_DEPTH)
-    # 2026-09-05 사용자 요청("저울에 15% 이상 버튼을 만드는건 어때?") -- 오늘 검증한 깊은눌림
-    # 문턱(15%)을 같은 캐시로 한 번 더 계산해서 탭으로 같이 보여준다.
-    deep_rows, deep_total = build_report(cache, name_to_code, min_depth=15.0)
+    # 2026-09-05 사용자 요청("저울에 15% 이상 버튼을 만드는건 어때?" -> 이후 "저울도 10%
+    # 이상으로 해줘"로 문턱 조정, 10%가 시기분할 재현성이 15%보다 더 안정적이었던 게 근거) --
+    # 오늘 검증한 깊은눌림 문턱(10%)을 같은 캐시로 한 번 더 계산해서 탭으로 같이 보여준다.
+    deep_rows, deep_total = build_report(cache, name_to_code, min_depth=10.0)
 
     # 2026-09-04 사용자 요청("오늘 추천종목... 다리넘은 종목 계속 결과 추적?") -- 오늘 새로
     # 뽑힌 강한이김 종목을 검증추적 트래커에 심는다(네트워크 불필요, seed만). 실제 진행상황
