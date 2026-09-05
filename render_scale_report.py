@@ -150,6 +150,19 @@ def _market_status_badge_html(code, dart_cache):
     return f'<span class="market-status-badge">{" · ".join(parts)}</span>'
 
 
+def get_safe_box_rows(strong_rows, dart_cache):
+    """2026-09-05 -- 안전박스(강한이김+재무경고없음) 필터를 재사용 가능한 함수로 분리(원래
+    _candidates_panel_html 안에 인라인으로만 있었음). "저울 안전박스 펀더멘털 리서치" 클라우드
+    라우틴이 오늘의 안전박스 종목 리스트를 이 함수로 직접 가져다 쓴다(docs/index.html을
+    파싱하는 것보다 안정적)."""
+    return [
+        r for r in strong_rows
+        if not _dart_badge_html(r["code"], dart_cache)
+        and not (dart_cache.get(r["code"], {}).get("market_status") or {}).get("management_issue")
+        and not (dart_cache.get(r["code"], {}).get("market_status") or {}).get("caution_issue")
+    ]
+
+
 def _high_vol_badge_html(high_vol):
     """2026-09-05 -- ⑥ZZ '고변동' 부스터 배지. DART/관리종목 배지와 달리 리스크가 아니라
     "이 터치가 통계적으로 더 믿을만한 신호"라는 긍정적 정보라 색을 초록 계열로 구분."""
@@ -887,12 +900,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
     # 추천 목록의 성격.
     # 2026-09-05(③PER/관리종목 여부 포팅 시 확장) -- KRX 공식 관리종목/투자주의환기 지정도
     # DART 재무경고와 별개의 진짜 리스크 신호라, 같은 최종후보 박스에서 같이 걸러낸다.
-    safe_rows = [
-        r for r in strong_rows
-        if not _dart_badge_html(r["code"], dart_cache)
-        and not (dart_cache.get(r["code"], {}).get("market_status") or {}).get("management_issue")
-        and not (dart_cache.get(r["code"], {}).get("market_status") or {}).get("caution_issue")
-    ]
+    safe_rows = get_safe_box_rows(strong_rows, dart_cache)
     safe_items_html = []
     for r in safe_rows:
         chart_id = f"chart-{panel_id}-{r['code']}"
