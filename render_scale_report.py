@@ -67,6 +67,24 @@ def _dart_badge_html(code, dart_cache):
     return (f'<span class="dart-badge" title="DART 재무제표 기반 선행경고, '
             f'공식 관리종목 지정과는 별개">💸 {reason}</span>')
 
+
+def _disclosure_html(code, dart_cache):
+    """2026-09-05 사용자 요청("이어해" -- ②최근 60일 공시 화면표시) -- 콜라
+    render_dashboard.py의 _disclosure_html과 같은 톤. 확대차트 라이트박스 안에 같이 넣어서
+    (새 인터랙션 없이 기존 "클릭하면 확대" 동선 재사용) 종목별 최근 이벤트성 공시를 보여준다."""
+    entry = dart_cache.get(code)
+    if not entry:
+        return ""
+    disclosures = entry.get("disclosures") or []
+    if not disclosures:
+        return ""
+    rows = "".join(
+        f'<div>{d["date"][:4]}-{d["date"][4:6]}-{d["date"][6:]} · {d["title"]}</div>'
+        for d in disclosures[:5]
+    )
+    return (f'<div class="disclosure-box">'
+            f'<b>📋 최근 60일 주요공시(DART)</b>{rows}</div>')
+
 THRESHOLD = 0.03
 # 2026-09-05 사용자 요청("저울1 자체를 2%->10%로 바꾸고 탭 하나로 통일해줘") -- 원래 2.0%는
 # "후보군을 넓게 본 뒤 점수로 거른다"는 취지로 최초 커밋(52d48c7)부터 있던 값인데, 검증(원래
@@ -695,7 +713,8 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
         dart_badge = _dart_badge_html(r["code"], dart_cache)
         chart_id = f"chart-{panel_id}-{r['code']}"
         detail_closes = r["recent_closes"][-DETAIL_CHART_DAYS:]
-        panel_content = _detail_chart_svg(r) + _multi_threshold_svg(detail_closes)
+        panel_content = (_detail_chart_svg(r) + _multi_threshold_svg(detail_closes)
+                          + _disclosure_html(r["code"], dart_cache))
         title = (f"{r['name']}({r['code']}) · 최근 구간 · "
                  f'<span style="color:{color};">터치 {tier}{r["score"]:+d} · 깊이{r["depth_pct"]:.1f}%p</span>')
         lightboxes_html.append(_chart_lightbox_html(chart_id, title, panel_content))
@@ -864,6 +883,9 @@ def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
                   color:#a05a1a; background:#fbeed8; border-radius:5px; padding:1px 6px; }}
   .strong-item-dart {{ display:block; margin-top:4px; }}
   .safe-box {{ border-color:#0a8a3c; }}
+  .disclosure-box {{ margin-top:10px; padding:8px 10px; background:#f7f6f2; border:1px solid #e5e3dc;
+                      border-radius:8px; font-size:11.5px; color:#52514e; line-height:1.6; }}
+  .disclosure-box b {{ color:#3d3550; }}
   .zz-chart-link {{ display:inline-block; cursor:zoom-in; border-radius:6px; }}
   .zz-chart-link:hover {{ outline:2px solid #cfe0f5; }}
   .zz-lightbox {{ display:none; position:fixed; inset:0; z-index:1000; }}
