@@ -40,6 +40,33 @@ def _load_kospi_regime():
     except (FileNotFoundError, json.JSONDecodeError):
         return None
 
+
+DART_RISK_CACHE_PATH = "dart_risk_cache.json"
+
+
+def _load_dart_risk_cache():
+    """2026-09-05 사용자 요청("콜라에 적용한 DART 재무경고를 저울에도") -- dart_risk_check.py
+    (별도 GHA refresh_dart_risk.yml이 매일 갱신, 네트워크 필요해 클라우드 라우틴 샌드박스에선
+    실행 안 함)가 만든 캐시를 읽기전용으로 읽는다. 캐시가 없거나(첫 실행 전) 특정 종목이
+    아직 조회 안 됐으면 조용히 빈 배지 -- 리포트 생성 자체를 막지 않는다."""
+    try:
+        with open(DART_RISK_CACHE_PATH, encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def _dart_badge_html(code, dart_cache):
+    entry = dart_cache.get(code)
+    if not entry:
+        return ""
+    cap = entry.get("capital", {})
+    if cap.get("warning") is not True:
+        return ""
+    reason = cap.get("reason") or "재무 경고"
+    return (f'<span class="dart-badge" title="DART 재무제표 기반 선행경고, '
+            f'공식 관리종목 지정과는 별개">💸 {reason}</span>')
+
 THRESHOLD = 0.03
 # 2026-09-05 사용자 요청("저울1 자체를 2%->10%로 바꾸고 탭 하나로 통일해줘") -- 원래 2.0%는
 # "후보군을 넓게 본 뒤 점수로 거른다"는 취지로 최초 커밋(52d48c7)부터 있던 값인데, 검증(원래
@@ -658,12 +685,14 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
     구분해서(예: chart-default-005930 vs chart-deep-005930) 두 패널이 같은 종목을 동시에
     보여줄 때도 라이트박스 앵커가 서로 충돌하지 않게 한다."""
     strong_rows = [r for r in top_rows if r["score"] >= 2]
+    dart_cache = _load_dart_risk_cache()
     rows_html = []
     lightboxes_html = []
     for i, r in enumerate(top_rows, 1):
         tier = _tier_of(r["score"])
         color, bg = TIER_COLOR[tier]
         yr_pos_html = f"{r['yr_pos']:.0f}%" if r["yr_pos"] is not None else "-"
+        dart_badge = _dart_badge_html(r["code"], dart_cache)
         chart_id = f"chart-{panel_id}-{r['code']}"
         detail_closes = r["recent_closes"][-DETAIL_CHART_DAYS:]
         panel_content = _detail_chart_svg(r) + _multi_threshold_svg(detail_closes)
@@ -672,7 +701,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
         lightboxes_html.append(_chart_lightbox_html(chart_id, title, panel_content))
         rows_html.append(f'''<tr>
       <td>{i}</td>
-      <td style="font-weight:700;">{r['name']}</td>
+      <td style="font-weight:700;">{r['name']}{dart_badge}</td>
       <td style="color:#898781;font-variant-numeric:tabular-nums;">{r['code']}</td>
       <td><span style="color:{color};background:{bg};border-radius:6px;padding:2px 8px;font-weight:700;">
           {r['score']:+d} {tier}</span></td>
@@ -691,6 +720,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
     for r in strong_rows:
         color, bg = TIER_COLOR["강한이김"]
         chart_id = f"chart-{panel_id}-{r['code']}"
+        item_dart_badge = _dart_badge_html(r["code"], dart_cache)
         strong_items_html.append(f'''<a href="#{chart_id}" class="strong-item">
           <span class="strong-item-top">
             <span class="strong-item-name">{r['name']}</span>
@@ -698,6 +728,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
             <span class="strong-item-score">{r['score']:+d}</span>
           </span>
           <span class="strong-item-sub">되돌림 {r['depth_pct']:.1f}%p · 하락다리 {r['leg_days']}일째 · {r['cur_price']:,.0f}원</span>
+          {f'<span class="strong-item-dart">{item_dart_badge}</span>' if item_dart_badge else ''}
         </a>''')
     stat = STAT_BY_DEPTH.get(min_depth, {"reach": None, "avg": None, "n": "?"})
     stat_txt = (f"5일 도달률 {stat['reach']:.1f}% · 평균 {stat['avg']:+.2f}% (2,700종목/n={stat['n']} 검증)"
@@ -712,9 +743,34 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
         '</div>'
     )
 
+    # 2026-09-05 사용자 요청("추가 추천박스 위에 저울로 걸러내서 뱃지 안다는 종목만... 위로
+    # 올려주면 좋겠어") -- 강한이김 중에서도 DART 재무경고(💸 배지)가 없는 종목만 한 번 더
+    # 걸러서, 기존 강한이김 박스보다 위에 별도 박스로 보여준다. "저울점수로 걸렀는데 회사
+    # 자체는 위험한" 경우(원풍물산류)를 이 박스에서는 아예 제외 -- 리스크까지 감안한 최종
+    # 추천 목록의 성격.
+    safe_rows = [r for r in strong_rows if not _dart_badge_html(r["code"], dart_cache)]
+    safe_items_html = []
+    for r in safe_rows:
+        chart_id = f"chart-{panel_id}-{r['code']}"
+        safe_items_html.append(f'''<a href="#{chart_id}" class="strong-item safe-item">
+          <span class="strong-item-top">
+            <span class="strong-item-name">{r['name']}</span>
+            <span class="strong-item-code">{r['code']}</span>
+            <span class="strong-item-score">{r['score']:+d}</span>
+          </span>
+          <span class="strong-item-sub">되돌림 {r['depth_pct']:.1f}%p · 하락다리 {r['leg_days']}일째 · {r['cur_price']:,.0f}원</span>
+        </a>''')
+    safe_box_html = f'''<div class="strong-box safe-box">
+      <div class="strong-box-title">✅ 강한이김 + 재무경고 없음 -- 리스크까지 거른 최종 후보
+        <span class="strong-box-stat">DART 완전자본잠식/3년연속적자 없는 것만 ({len(safe_rows)}/{len(strong_rows)}개)</span>
+      </div>
+      <div class="strong-box-grid">{"".join(safe_items_html)}</div>
+    </div>''' if strong_rows else ""
+
     base_date = top_rows[0]["last_date"].date() if top_rows else "-"
     body = f'''<div class="sub">기준일 {base_date} · 하락다리(반등기대) 후보 {total_candidates}종목 중 상위 {len(top_rows)} ·
     강한이김(≥2점) {len(strong_rows)}개</div>
+  {safe_box_html}
   {strong_box_html}
   <div class="table-scroll">
   <table>
@@ -804,6 +860,10 @@ def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
   .verif-badge-reach {{ background:#f3f2ea; color:#7b6b1a; }}
   .verif-badge-wait {{ background:#f0efe9; color:#898781; }}
   .verif-note {{ margin-top:8px; font-size:11.5px; color:#898781; line-height:1.6; }}
+  .dart-badge {{ display:inline-block; margin-left:6px; font-size:10.5px; font-weight:700;
+                  color:#a05a1a; background:#fbeed8; border-radius:5px; padding:1px 6px; }}
+  .strong-item-dart {{ display:block; margin-top:4px; }}
+  .safe-box {{ border-color:#0a8a3c; }}
   .zz-chart-link {{ display:inline-block; cursor:zoom-in; border-radius:6px; }}
   .zz-chart-link:hover {{ outline:2px solid #cfe0f5; }}
   .zz-lightbox {{ display:none; position:fixed; inset:0; z-index:1000; }}

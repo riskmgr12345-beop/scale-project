@@ -1,0 +1,47 @@
+name: 저울 DART 재무경고 갱신
+
+# 2026-09-05 사용자 요청("v3, 콜라, 환타, zz 등에서 분석 적용한 내용중 저울에 적용 도움되는
+# 내용 모두 검토" -> "순서대로 시작해") -- 콜라 프로젝트의 DART 재무경고(완전자본잠식/3년연속
+# 적자)+최근 60일 이벤트성 공시 연동을 저울에도 포팅. 원풍물산 사례처럼 순수 가격·거래량
+# 통계로는 못 잡는 개별 종목 리스크(회사 자체가 위험한 경우)를 DART 재무제표로 선행 경고한다.
+#
+# 오늘 상위 20개(강한이김 후보)에만 한정 적용(dart_risk_check.py가 render_scale_report.py의
+# build_report()로 오늘 후보를 먼저 뽑고, 그 종목들만 DART 조회) -- 2,700종목 전체를 매일
+# 조회하면 API 부담이 크다. 클라우드 라우틴 샌드박스는 네트워크가 막혀 있어 이 스크립트를
+# 못 돌리므로(FinanceDataReader/kospi_regime과 동일한 제약) GHA가 대신 매일 담당한다.
+#
+# 필요 설정: 이 저장소(scale-project) Settings > Secrets and variables > Actions에
+# DART_API_KEY를 등록해야 함(opendart.fss.or.kr에서 발급).
+
+on:
+  schedule:
+    - cron: '55 7 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install -r requirements.txt
+
+      - name: DART 재무경고 갱신
+        env:
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: python dart_risk_check.py
+
+      - name: 변경사항 커밋
+        run: |
+          git config user.name "scale-project-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add dart_risk_cache.json dart_corp_codes.json
+          git diff --cached --quiet || git commit -m "자동: 저울 DART 재무경고 갱신 $(date -u +%Y-%m-%d)"
+          git push
