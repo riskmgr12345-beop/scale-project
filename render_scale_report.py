@@ -179,6 +179,15 @@ def _high_vol_badge_html(high_vol):
     return '<span class="high-vol-badge" title="이 종목 평소 변동폭 대비 오늘 되돌림이 더 큼(재검증 재현됨)">⚡고변동</span>'
 
 
+def _intraday_fade_badge_html(intraday_fade):
+    """2026-09-07 사용자 질문에서 시작된 신규 부스터 배지. 고변동과 마찬가지로 리스크가 아니라
+    "이 터치가 통계적으로 더 믿을만한 신호"라는 긍정적 정보 -- 반직관적이지만(장중 오르다 빠진
+    게 왜 좋은 신호?) 고변동 통제 후에도 재현된 실측 결과를 근거로 채택."""
+    if not intraday_fade:
+        return ""
+    return '<span class="high-vol-badge" title="장중고점 대비 종가가 3%p+ 밀림(반직관적이지만 재검증 재현됨)">🔄장중반전</span>'
+
+
 def _disclosure_html(code, dart_cache):
     """2026-09-05 사용자 요청("이어해" -- ②최근 60일 공시 화면표시) -- 콜라
     render_dashboard.py의 _disclosure_html과 같은 톤. 확대차트 라이트박스 안에 같이 넣어서
@@ -406,6 +415,25 @@ def _is_high_volatility_touch(highs, lows, closes, depth_pct):
     return (depth_pct / avg_range) >= 1.0
 
 
+INTRADAY_FADE_THRESHOLD = 3.0  # 장중고점 대비 종가 3%p+ 밀리면 "올랐다가 빠짐"
+
+
+def _is_intraday_fade(day_high, entry_price):
+    """2026-09-07 사용자 질문("개장에 올랐다가 빠지는 경우가 많잖아, 오르는 종목과 오르다
+    빠지는 종목의 차이점이 있나? 확률은?")에서 출발한 신규 부스터. 저울은 분봉이 없어 "몇 시에
+    올랐다가 몇 시에 빠졌는지"는 못 보지만, 그날 장중고점 대비 종가가 얼마나 밀렸는지는 일봉
+    고가/종가로 계산 가능하다. 강한이김(>=2) 모집단(n=16,107)에 순수분리로 검증(intraday_
+    fade_test.py) -- 반직관적으로 "올랐다가 빠진" 쪽이 도달률·평균수익 둘 다 더 좋음(72.9%/
+    +0.61% vs 72.6%/-0.03%). 이미 채택된 ⑥고변동 부스터의 착시가 아닌지 통제 검증
+    (intraday_fade_controlled_test.py) -- 고변동/저변동 두 층 다, 그리고 시기분할까지 4갈래
+    전부 방향 일치로 재현됨(예: 고변동 안에서 76.2%/+1.49% vs 73.2%/+0.07%) -- 독립 신호로
+    확인."""
+    if not day_high or not entry_price:
+        return False
+    fade_pct = (day_high - entry_price) / day_high * 100
+    return fade_pct >= INTRADAY_FADE_THRESHOLD
+
+
 def year_range_position_pct(closes, highs, lows):
     window = min(len(closes), 252)
     yr_high = max(highs[-window:])
@@ -502,6 +530,7 @@ def build_report(cache=None, name_to_code=None, min_depth=MIN_DEPTH):
 
         yr_pos = year_range_position_pct(closes, highs, lows)
         high_vol = _is_high_volatility_touch(highs, lows, closes, depth_pct)
+        intraday_fade = _is_intraday_fade(highs[-1], entry_price)
 
         rows.append({
             "name": name, "code": name_to_code.get(name, "-"), "score": score,
@@ -509,7 +538,7 @@ def build_report(cache=None, name_to_code=None, min_depth=MIN_DEPTH):
             "leg_days": pos["leg_days"], "leg_start_date": pos["leg_start_date"],
             "depth_pct": depth_pct, "cur_price": entry_price,
             "yr_pos": yr_pos, "risk_flag": risk_flag, "vr": vr, "fast_rev": fast_rev,
-            "high_vol": high_vol,
+            "high_vol": high_vol, "intraday_fade": intraday_fade,
             "last_date": dates_idx[-1], "recent_closes": closes[-SPARKLINE_DAYS:],
             "recent_dates": list(dates_idx[-SPARKLINE_DAYS:]), "recent_lows": lows[-SPARKLINE_DAYS:],
         })
@@ -846,6 +875,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
         dart_badge = _dart_badge_html(r["code"], dart_cache)
         market_badge = _market_status_badge_html(r["code"], dart_cache)
         high_vol_badge = _high_vol_badge_html(r.get("high_vol"))
+        fade_badge = _intraday_fade_badge_html(r.get("intraday_fade"))
         chart_id = f"chart-{panel_id}-{r['code']}"
         detail_closes = r["recent_closes"][-DETAIL_CHART_DAYS:]
         panel_content = (_detail_chart_svg(r) + _multi_threshold_svg(detail_closes)
@@ -855,7 +885,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
         lightboxes_html.append(_chart_lightbox_html(chart_id, title, panel_content))
         rows_html.append(f'''<tr>
       <td>{i}</td>
-      <td style="font-weight:700;">{r['name']}{dart_badge}{market_badge}{high_vol_badge}</td>
+      <td style="font-weight:700;">{r['name']}{dart_badge}{market_badge}{high_vol_badge}{fade_badge}</td>
       <td style="color:#898781;font-variant-numeric:tabular-nums;">{r['code']}</td>
       <td><span style="color:{color};background:{bg};border-radius:6px;padding:2px 8px;font-weight:700;">
           {r['score']:+d} {tier}</span></td>
@@ -877,6 +907,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
         item_dart_badge = _dart_badge_html(r["code"], dart_cache)
         item_market_badge = _market_status_badge_html(r["code"], dart_cache)
         item_high_vol_badge = _high_vol_badge_html(r.get("high_vol"))
+        item_fade_badge = _intraday_fade_badge_html(r.get("intraday_fade"))
         strong_items_html.append(f'''<a href="#{chart_id}" class="strong-item">
           <span class="strong-item-top">
             <span class="strong-item-name">{r['name']}</span>
@@ -887,6 +918,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
           {f'<span class="strong-item-dart">{item_dart_badge}</span>' if item_dart_badge else ''}
           {f'<span class="strong-item-dart">{item_market_badge}</span>' if item_market_badge else ''}
           {f'<span class="strong-item-dart">{item_high_vol_badge}</span>' if item_high_vol_badge else ''}
+          {f'<span class="strong-item-dart">{item_fade_badge}</span>' if item_fade_badge else ''}
         </a>''')
     stat = STAT_BY_DEPTH.get(min_depth, {"reach": None, "avg": None, "n": "?"})
     stat_txt = (f"5일 도달률 {stat['reach']:.1f}% · 평균 {stat['avg']:+.2f}% (2,700종목/n={stat['n']} 검증)"
@@ -913,6 +945,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
     for r in safe_rows:
         chart_id = f"chart-{panel_id}-{r['code']}"
         safe_item_market_badge = _market_status_badge_html(r["code"], dart_cache)
+        safe_item_fade_badge = _intraday_fade_badge_html(r.get("intraday_fade"))
         safe_items_html.append(f'''<a href="#{chart_id}" class="strong-item safe-item">
           <span class="strong-item-top">
             <span class="strong-item-name">{r['name']}</span>
@@ -921,6 +954,7 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
           </span>
           <span class="strong-item-sub">되돌림 {r['depth_pct']:.1f}%p · 하락다리 {r['leg_days']}일째 · {r['cur_price']:,.0f}원</span>
           {f'<span class="strong-item-dart">{safe_item_market_badge}</span>' if safe_item_market_badge else ''}
+          {f'<span class="strong-item-dart">{safe_item_fade_badge}</span>' if safe_item_fade_badge else ''}
         </a>''')
     safe_box_html = f'''<div class="strong-box safe-box">
       <div class="strong-box-title">✅ 강한이김 + 재무경고 없음 -- 리스크까지 거른 최종 후보
