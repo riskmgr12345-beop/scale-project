@@ -494,6 +494,18 @@ def build_report(cache=None, name_to_code=None, min_depth=MIN_DEPTH):
     if cache is None or name_to_code is None:
         cache, name_to_code = _load_cache_and_names()
 
+    # 2026-09-07 사용자 발견(마이크로디지탈이 66% "폭락" 후보 1위로 뜸 -- 실제로는 09-04에
+    # 진짜 거래정지된 종목) -- 기존 _trailing_zero_volume_run은 "정지 중에도 데이터가 계속
+    # 나오면서 거래량만 0"인 대교류 패턴만 잡는다. 마이크로디지탈은 그와 달리 09-04 이후로
+    # 데이터 자체가 아예 끊겨서(콜라 캐시의 다른 대부분 종목은 09-07까지 있는데 이 종목만
+    # 09-04에서 멈춤) 거래량0 연속일수 조건에 안 걸렸다 -- 데이터가 끊긴 것 자체가 "지금 살
+    # 수 없는 종목"이라는 훨씬 확실한 신호라, 캐시 전체의 최신 거래일 대비 자기 마지막 날짜가
+    # 뒤처진 종목도 후보에서 제외한다.
+    cache_latest_date = max(
+        (df.index[-1] for df in cache.values() if len(df.index) > 0), default=None
+    )
+    STALE_DATA_MAX_LAG_DAYS = 1
+
     rows = []
     for name, df in cache.items():
         try:
@@ -504,6 +516,9 @@ def build_report(cache=None, name_to_code=None, min_depth=MIN_DEPTH):
             dates_idx = list(df.index)
         except Exception:
             continue
+        if (cache_latest_date is not None and dates_idx
+                and (cache_latest_date - dates_idx[-1]).days > STALE_DATA_MAX_LAG_DAYS):
+            continue  # 캐시 최신일 대비 데이터 자체가 뒤처짐 -- 거래정지/상장폐지 등으로 추정
         if _trailing_zero_volume_run(volumes) >= HALT_MIN_TRAILING_ZERO_DAYS:
             continue  # 현재 거래정지 추정 -- 실제로 사고팔 수 없는 종목은 아예 후보에서 제외
         closes, highs, lows, volumes, dates_idx = _drop_zero_volume_days(
