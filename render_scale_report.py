@@ -998,14 +998,15 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
     stat = STAT_BY_DEPTH.get(min_depth, {"reach": None, "avg": None, "n": "?"})
     stat_txt = (f"5일 도달률 {stat['reach']:.1f}% · 평균 {stat['avg']:+.2f}% (2,700종목/n={stat['n']} 검증)"
                 if stat["reach"] is not None else "검증치 준비중")
+    panel_base_date = top_rows[0]["last_date"].date() if top_rows else None
     strong_box_html = f'''<div class="strong-box">
       <div class="strong-box-title">🟢 강한이김(저울점수 ≥2점) -- 실측상 신뢰 가능한 신호
         <span class="strong-box-stat">{stat_txt}</span>
       </div>
       <div class="strong-box-grid">{"".join(strong_items_html)}</div>
     </div>''' if strong_rows else (
-        '<div class="strong-box strong-box-empty">🟢 강한이김(≥2점) 신호 -- 오늘은 해당 종목 없음'
-        '</div>'
+        f'<div class="strong-box strong-box-empty">🟢 강한이김(≥2점) 신호 -- '
+        f'오늘({panel_base_date if panel_base_date else "-"})은 해당 종목 없음</div>'
     )
 
     # 2026-09-05 사용자 요청("추가 추천박스 위에 저울로 걸러내서 뱃지 안다는 종목만... 위로
@@ -1085,9 +1086,9 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
     base_date = top_rows[0]["last_date"].date() if top_rows else "-"
     body = f'''<div class="sub">기준일 {base_date} · 하락다리(반등기대) 후보 {total_candidates}종목 중 상위 {len(top_rows)} ·
     강한이김(≥2점) {len(strong_rows)}개</div>
+  {strong_box_html}
   {safe_box_html}
   {fund_section_html}
-  {strong_box_html}
   <div class="table-scroll">
   <table>
     <tr><th>#</th><th>종목명</th><th>코드</th><th>저울점수</th><th>시소</th><th>최근흐름</th>
