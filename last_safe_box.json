@@ -1,0 +1,86 @@
+{
+  "date": "2026-09-03",
+  "rows": [
+    {
+      "name": "휴온스글로벌",
+      "code": "084110",
+      "score": 4,
+      "depth_pct": 17.2291296625222,
+      "leg_days": 4,
+      "cur_price": 23650.0,
+      "intraday_fade": true
+    },
+    {
+      "name": "바이오다인",
+      "code": "314930",
+      "score": 4,
+      "depth_pct": 15.47911547911548,
+      "leg_days": 15,
+      "cur_price": 7040.0,
+      "intraday_fade": true
+    },
+    {
+      "name": "와이엠티",
+      "code": "251370",
+      "score": 4,
+      "depth_pct": 14.102564102564102,
+      "leg_days": 2,
+      "cur_price": 6730.0,
+      "intraday_fade": true
+    },
+    {
+      "name": "원익홀딩스",
+      "code": "030530",
+      "score": 4,
+      "depth_pct": 10.429769392033544,
+      "leg_days": 4,
+      "cur_price": 17320.0,
+      "intraday_fade": true
+    },
+    {
+      "name": "데이타솔루션",
+      "code": "263800",
+      "score": 3,
+      "depth_pct": 18.0,
+      "leg_days": 12,
+      "cur_price": 4610.0,
+      "intraday_fade": true
+    },
+    {
+      "name": "경남제약",
+      "code": "053950",
+      "score": 3,
+      "depth_pct": 11.80995475113122,
+      "leg_days": 1,
+      "cur_price": 1974.0,
+      "intraday_fade": true
+    },
+    {
+      "name": "코람코더원리츠",
+      "code": "417310",
+      "score": 2,
+      "depth_pct": 78.649138712602,
+      "leg_days": 2,
+      "cur_price": 2365.0,
+      "intraday_fade": false
+    },
+    {
+      "name": "휴온스",
+      "code": "243070",
+      "score": 2,
+      "depth_pct": 20.306513409961685,
+      "leg_days": 18,
+      "cur_price": 20950.0,
+      "intraday_fade": false
+    },
+    {
+      "name": "더본코리아",
+      "code": "475560",
+      "score": 2,
+      "depth_pct": 18.61353711790393,
+      "leg_days": 7,
+      "cur_price": 15090.0,
+      "intraday_fade": true
+    }
+  ]
+}

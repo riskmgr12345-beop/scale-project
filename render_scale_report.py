@@ -43,6 +43,66 @@ def _load_kospi_regime():
 
 DART_RISK_CACHE_PATH = "dart_risk_cache.json"
 FUNDAMENTAL_RESEARCH_CACHE_PATH = "fundamental_research_cache.json"
+LAST_SAFE_BOX_PATH = "last_safe_box.json"
+
+
+def _load_last_safe_box():
+    """2026-09-08 사용자 요청("새로운 추천이 없으면... 기존 추천 9종목은 보여지게") -- 강한이김
+    신호가 며칠씩 0건인 날(09-04~09-07 실제로 있었음)에 안전박스가 그냥 통째로 사라지는 대신,
+    마지막으로 신호가 있었던 날의 목록을 계속 보여준다. 이 파일은 safe_rows가 비어있지 않을
+    때마다 덮어써지므로 "가장 최근에 실제로 존재했던 안전박스"만 담는다(누적 아님)."""
+    try:
+        with open(LAST_SAFE_BOX_PATH, encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
+
+
+def _save_last_safe_box(date_str, safe_rows):
+    payload = {
+        "date": date_str,
+        "rows": [
+            {"name": r["name"], "code": r["code"], "score": r["score"],
+             "depth_pct": r["depth_pct"], "leg_days": r["leg_days"],
+             "cur_price": r["cur_price"], "intraday_fade": r.get("intraday_fade", False)}
+            for r in safe_rows
+        ],
+    }
+    with open(LAST_SAFE_BOX_PATH, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+
+
+# 2026-09-08 -- 안전박스 카드의 ✕ 버튼으로 사용자가 직접 카드를 숨길 수 있게 한다. 이 사이트는
+# GitHub Pages 정적 호스팅이라 서버에 삭제를 기록할 방법이 없으므로 localStorage(이 브라우저
+# 안에서만 유지, 기기/브라우저마다 따로)로 처리 -- f-string 안에서 JS 중괄호를 전부 이스케이프
+# 하는 걸 피하려고 별도 상수로 분리(변수 하나로만 삽입).
+_SAFE_BOX_DISMISS_SCRIPT = """<script>
+(function() {
+  var STORE_KEY = 'scale_dismissed_codes';
+  var dismissed = [];
+  try { dismissed = JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); } catch (e) { dismissed = []; }
+  var grid = document.getElementById('safe-box-grid');
+  if (!grid) return;
+  dismissed.forEach(function(code) {
+    var el = grid.querySelector('[data-dismiss-code="' + code + '"]');
+    if (el) el.hidden = true;
+  });
+  grid.addEventListener('click', function(ev) {
+    var btn = ev.target.closest('.strong-item-delete');
+    if (!btn) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    var card = btn.closest('.strong-item');
+    if (!card) return;
+    var code = card.getAttribute('data-dismiss-code');
+    if (code && dismissed.indexOf(code) === -1) {
+      dismissed.push(code);
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(dismissed)); } catch (e) {}
+    }
+    card.hidden = true;
+  });
+})();
+</script>"""
 
 
 def _load_dart_risk_cache():
@@ -955,28 +1015,69 @@ def _candidates_panel_html(top_rows, total_candidates, panel_id, min_depth):
     # 추천 목록의 성격.
     # 2026-09-05(③PER/관리종목 여부 포팅 시 확장) -- KRX 공식 관리종목/투자주의환기 지정도
     # DART 재무경고와 별개의 진짜 리스크 신호라, 같은 최종후보 박스에서 같이 걸러낸다.
+    # 2026-09-08 사용자 요청("새로운 추천이 없으면 빈박스에 오늘 추천 없음... 기존 추천
+    # 9종목은 보여지게") -- 강한이김이 며칠 연속 0건인 날에도 안전박스가 통째로 안 사라지게,
+    # 오늘 신호가 없으면 마지막으로 신호가 있었던 날의 목록을 대신 보여준다.
     safe_rows = get_safe_box_rows(strong_rows, dart_cache)
+    base_date_str = str(top_rows[0]["last_date"].date()) if top_rows else None
+    is_stale_safe_box = False
+    stale_date = None
+    if safe_rows:
+        if base_date_str:
+            _save_last_safe_box(base_date_str, safe_rows)
+    else:
+        last_safe = _load_last_safe_box()
+        if last_safe and last_safe.get("rows"):
+            safe_rows = last_safe["rows"]
+            is_stale_safe_box = True
+            stale_date = last_safe.get("date")
+
     safe_items_html = []
     for r in safe_rows:
-        chart_id = f"chart-{panel_id}-{r['code']}"
         safe_item_market_badge = _market_status_badge_html(r["code"], dart_cache)
         safe_item_fade_badge = _intraday_fade_badge_html(r.get("intraday_fade"))
-        safe_items_html.append(f'''<a href="#{chart_id}" class="strong-item safe-item">
-          <span class="strong-item-top">
+        delete_btn = ('<button type="button" class="strong-item-delete" '
+                      'title="이 카드 숨기기(이 브라우저에만 적용)">✕</button>')
+        card_body = f'''<span class="strong-item-top">
             <span class="strong-item-name">{r['name']}</span>
             <span class="strong-item-code">{r['code']}</span>
             <span class="strong-item-score">{r['score']:+d}</span>
           </span>
           <span class="strong-item-sub">되돌림 {r['depth_pct']:.1f}%p · 하락다리 {r['leg_days']}일째 · {r['cur_price']:,.0f}원</span>
           {f'<span class="strong-item-dart">{safe_item_market_badge}</span>' if safe_item_market_badge else ''}
-          {f'<span class="strong-item-dart">{safe_item_fade_badge}</span>' if safe_item_fade_badge else ''}
-        </a>''')
-    safe_box_html = f'''<div class="strong-box safe-box">
+          {f'<span class="strong-item-dart">{safe_item_fade_badge}</span>' if safe_item_fade_badge else ''}'''
+        if is_stale_safe_box:
+            # 오늘 계산된 후보가 아니라 라이트박스 확대차트 데이터가 없으므로 클릭 링크(<a>) 대신
+            # 정적 카드(<div>)로 표시.
+            safe_items_html.append(
+                f'<div class="strong-item safe-item safe-item-stale" data-dismiss-code="{r["code"]}">'
+                f'{delete_btn}{card_body}</div>')
+        else:
+            chart_id = f"chart-{panel_id}-{r['code']}"
+            safe_items_html.append(
+                f'<a href="#{chart_id}" class="strong-item safe-item" data-dismiss-code="{r["code"]}">'
+                f'{delete_btn}{card_body}</a>')
+
+    if not safe_rows:
+        safe_box_html = (
+            '<div class="strong-box safe-box safe-box-empty">✅ 강한이김 + 재무경고 없음 -- '
+            '오늘 추천 없음</div>'
+        )
+    else:
+        stale_notice = (
+            f'<div class="safe-box-stale-notice">⚠ 오늘은 새 신호가 없어 {stale_date} 마지막 추천을 '
+            f'계속 보여주는 중입니다 -- 카드의 ✕로 직접 지울 수 있습니다(이 브라우저에만 적용).</div>'
+        ) if is_stale_safe_box else ""
+        stat_txt = (f"DART 재무경고·관리종목·투자주의환기 없는 것만 ({len(safe_rows)}/{len(strong_rows)}개)"
+                    if not is_stale_safe_box else f"{stale_date} 기준 {len(safe_rows)}개(마지막 추천 유지)")
+        safe_box_html = f'''<div class="strong-box safe-box">
       <div class="strong-box-title">✅ 강한이김 + 재무경고 없음 -- 리스크까지 거른 최종 후보
-        <span class="strong-box-stat">DART 재무경고·관리종목·투자주의환기 없는 것만 ({len(safe_rows)}/{len(strong_rows)}개)</span>
+        <span class="strong-box-stat">{stat_txt}</span>
       </div>
-      <div class="strong-box-grid">{"".join(safe_items_html)}</div>
-    </div>''' if strong_rows else ""
+      {stale_notice}
+      <div class="strong-box-grid" id="safe-box-grid">{"".join(safe_items_html)}</div>
+    </div>
+    {_SAFE_BOX_DISMISS_SCRIPT}'''
 
     fundamental_cache = _load_fundamental_research_cache()
     fund_section_html = _fundamental_research_section_html(safe_rows, fundamental_cache)
@@ -1060,8 +1161,10 @@ def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
   .strong-box-stat {{ font-size:12px; font-weight:600; color:#3d7a52; }}
   .strong-box-grid {{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
                        gap:8px; }}
-  .strong-item {{ display:block; background:#fff; border:1px solid #bfe3cb; border-radius:8px;
-                   padding:8px 10px; text-decoration:none; color:#1c1d1f; cursor:zoom-in; }}
+  .strong-item {{ display:block; position:relative; background:#fff; border:1px solid #bfe3cb;
+                   border-radius:8px; padding:8px 10px; text-decoration:none; color:#1c1d1f;
+                   cursor:zoom-in; }}
+  .safe-item {{ padding-right:26px; }}
   .strong-item:hover {{ border-color:#0a8a3c; box-shadow:0 2px 8px rgba(10,138,60,0.15); }}
   .strong-item-top {{ display:flex; align-items:center; gap:6px; font-size:13.5px; }}
   .strong-item-name {{ font-weight:700; }}
@@ -1107,6 +1210,18 @@ def render_html(top_rows, total_candidates, deep_rows=None, deep_total=None):
   .fund-card-updated {{ font-size:10px; color:#b3b0a6; margin-top:4px; }}
   .strong-item-dart {{ display:block; margin-top:4px; }}
   .safe-box {{ border-color:#0a8a3c; }}
+  .safe-box-empty {{ padding:14px 16px; font-size:13px; color:#5a6b5e; }}
+  .safe-box-stale-notice {{ font-size:11.5px; color:#a05818; background:#fbf3d8;
+                             border:1px solid #ecdca0; border-radius:6px; padding:6px 10px;
+                             margin-bottom:8px; }}
+  .safe-item-stale {{ cursor:default; }}
+  .safe-item-stale:hover {{ border-color:#bfe3cb; box-shadow:none; }}
+  .strong-item-delete {{ position:absolute; top:4px; right:4px; width:18px; height:18px;
+                          line-height:16px; text-align:center; padding:0; border:1px solid #e5e3dc;
+                          border-radius:50%; background:#fff; color:#898781; font-size:11px;
+                          cursor:pointer; }}
+  .strong-item-delete:hover {{ color:#c0392b; border-color:#c0392b; }}
+  .strong-box-grid [hidden] {{ display:none; }}
   .disclosure-box {{ margin-top:10px; padding:8px 10px; background:#f7f6f2; border:1px solid #e5e3dc;
                       border-radius:8px; font-size:11.5px; color:#52514e; line-height:1.6; }}
   .disclosure-box b {{ color:#3d3550; }}
