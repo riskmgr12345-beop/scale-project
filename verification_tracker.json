@@ -90,8 +90,8 @@
       "running_low": 4400,
       "reached_breakeven": true,
       "reached_date": "2026-09-04",
-      "leg_flipped": false,
-      "leg_flip_date": null,
+      "leg_flipped": true,
+      "leg_flip_date": "2026-09-04",
       "history": [
         {
           "date": "2026-09-03",
@@ -171,8 +171,8 @@
       "running_low": 9500,
       "reached_breakeven": false,
       "reached_date": null,
-      "leg_flipped": false,
-      "leg_flip_date": null,
+      "leg_flipped": true,
+      "leg_flip_date": "2026-09-04",
       "history": [
         {
           "date": "2026-09-03",
