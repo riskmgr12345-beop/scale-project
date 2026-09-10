@@ -1,12 +1,13 @@
 {
-  "active": {
-    "휴온스글로벌": {
+  "active": {},
+  "completed": {
+    "휴온스글로벌__2026-09-03": {
       "code": "084110",
       "entry_date": "2026-09-03",
       "entry_price": 23650.0,
       "score": 4,
       "depth_pct_at_entry": 17.2291296625222,
-      "running_low": 23100,
+      "running_low": 22600,
       "reached_breakeven": true,
       "reached_date": "2026-09-04",
       "leg_flipped": true,
@@ -31,17 +32,26 @@
         {
           "date": "2026-09-09",
           "close": 23150
+        },
+        {
+          "date": "2026-09-10",
+          "close": 22600
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "휴온스글로벌",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 22600,
+      "final_return_pct": -4.439746300211411
     },
-    "바이오다인": {
+    "바이오다인__2026-09-03": {
       "code": "314930",
       "entry_date": "2026-09-03",
       "entry_price": 7040.0,
       "score": 4,
       "depth_pct_at_entry": 15.47911547911548,
-      "running_low": 6940,
+      "running_low": 6610,
       "reached_breakeven": true,
       "reached_date": "2026-09-07",
       "leg_flipped": true,
@@ -66,11 +76,20 @@
         {
           "date": "2026-09-09",
           "close": 7140
+        },
+        {
+          "date": "2026-09-10",
+          "close": 6610
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "바이오다인",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 6610,
+      "final_return_pct": -6.107954545454541
     },
-    "와이엠티": {
+    "와이엠티__2026-09-03": {
       "code": "251370",
       "entry_date": "2026-09-03",
       "entry_price": 6730.0,
@@ -101,11 +120,20 @@
         {
           "date": "2026-09-09",
           "close": 7160
+        },
+        {
+          "date": "2026-09-10",
+          "close": 7430
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "와이엠티",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 7430,
+      "final_return_pct": 10.40118870728084
     },
-    "박셀바이오": {
+    "박셀바이오__2026-09-03": {
       "code": "323990",
       "entry_date": "2026-09-03",
       "entry_price": 4490.0,
@@ -136,11 +164,20 @@
         {
           "date": "2026-09-09",
           "close": 4685
+        },
+        {
+          "date": "2026-09-10",
+          "close": 4525
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "박셀바이오",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 4525,
+      "final_return_pct": 0.7795100222717233
     },
-    "원익홀딩스": {
+    "원익홀딩스__2026-09-03": {
       "code": "030530",
       "entry_date": "2026-09-03",
       "entry_price": 17320.0,
@@ -171,11 +208,20 @@
         {
           "date": "2026-09-09",
           "close": 23250
+        },
+        {
+          "date": "2026-09-10",
+          "close": 23250
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "원익홀딩스",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 23250,
+      "final_return_pct": 34.237875288683604
     },
-    "라온텍": {
+    "라온텍__2026-09-03": {
       "code": "418420",
       "entry_date": "2026-09-03",
       "entry_price": 4020.0,
@@ -206,11 +252,20 @@
         {
           "date": "2026-09-09",
           "close": 4090
+        },
+        {
+          "date": "2026-09-10",
+          "close": 4050
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "라온텍",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 4050,
+      "final_return_pct": 0.746268656716409
     },
-    "케이엔에스": {
+    "케이엔에스__2026-09-03": {
       "code": "432470",
       "entry_date": "2026-09-03",
       "entry_price": 9980.0,
@@ -241,11 +296,20 @@
         {
           "date": "2026-09-09",
           "close": 10050
+        },
+        {
+          "date": "2026-09-10",
+          "close": 9980
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "케이엔에스",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 9980,
+      "final_return_pct": 0.0
     },
-    "선진뷰티사이언스": {
+    "선진뷰티사이언스__2026-09-03": {
       "code": "086710",
       "entry_date": "2026-09-03",
       "entry_price": 7210.0,
@@ -276,17 +340,26 @@
         {
           "date": "2026-09-09",
           "close": 6990
+        },
+        {
+          "date": "2026-09-10",
+          "close": 6990
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "선진뷰티사이언스",
+      "exit_date": "2026-09-10",
+      "exit_reason": "미도달",
+      "final_price": 6990,
+      "final_return_pct": -3.051317614424409
     },
-    "모나용평": {
+    "모나용평__2026-09-03": {
       "code": "070960",
       "entry_date": "2026-09-03",
       "entry_price": 1994.0,
       "score": 4,
       "depth_pct_at_entry": 9.057471264367816,
-      "running_low": 1990,
+      "running_low": 1960,
       "reached_breakeven": true,
       "reached_date": "2026-09-04",
       "leg_flipped": false,
@@ -311,11 +384,20 @@
         {
           "date": "2026-09-09",
           "close": 2000
+        },
+        {
+          "date": "2026-09-10",
+          "close": 1960
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "모나용평",
+      "exit_date": "2026-09-10",
+      "exit_reason": "본전회복",
+      "final_price": 1960,
+      "final_return_pct": -1.7051153460381108
     },
-    "더핑크퐁컴퍼니": {
+    "더핑크퐁컴퍼니__2026-09-03": {
       "code": "403850",
       "entry_date": "2026-09-03",
       "entry_price": 13080.0,
@@ -346,17 +428,26 @@
         {
           "date": "2026-09-09",
           "close": 12600
+        },
+        {
+          "date": "2026-09-10",
+          "close": 12420
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "더핑크퐁컴퍼니",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 12420,
+      "final_return_pct": -5.045871559633031
     },
-    "다스코": {
+    "다스코__2026-09-03": {
       "code": "058730",
       "entry_date": "2026-09-03",
       "entry_price": 3705.0,
       "score": 4,
       "depth_pct_at_entry": 8.50253807106599,
-      "running_low": 3480,
+      "running_low": 3360,
       "reached_breakeven": false,
       "reached_date": null,
       "leg_flipped": true,
@@ -381,17 +472,26 @@
         {
           "date": "2026-09-09",
           "close": 3480
+        },
+        {
+          "date": "2026-09-10",
+          "close": 3360
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "다스코",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 3360,
+      "final_return_pct": -9.311740890688258
     },
-    "바이오니아": {
+    "바이오니아__2026-09-03": {
       "code": "064550",
       "entry_date": "2026-09-03",
       "entry_price": 10240.0,
       "score": 4,
       "depth_pct_at_entry": 8.0,
-      "running_low": 9800,
+      "running_low": 9280,
       "reached_breakeven": true,
       "reached_date": "2026-09-04",
       "leg_flipped": true,
@@ -416,11 +516,20 @@
         {
           "date": "2026-09-09",
           "close": 9800
+        },
+        {
+          "date": "2026-09-10",
+          "close": 9280
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "바이오니아",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 9280,
+      "final_return_pct": -9.375
     },
-    "판타지오": {
+    "판타지오__2026-09-03": {
       "code": "032800",
       "entry_date": "2026-09-03",
       "entry_price": 1487.0,
@@ -451,11 +560,20 @@
         {
           "date": "2026-09-09",
           "close": 1495
+        },
+        {
+          "date": "2026-09-10",
+          "close": 1490
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "판타지오",
+      "exit_date": "2026-09-10",
+      "exit_reason": "본전회복",
+      "final_price": 1490,
+      "final_return_pct": 0.20174848688634395
     },
-    "태웅": {
+    "태웅__2026-09-03": {
       "code": "044490",
       "entry_date": "2026-09-03",
       "entry_price": 34500.0,
@@ -486,17 +604,26 @@
         {
           "date": "2026-09-09",
           "close": 36150
+        },
+        {
+          "date": "2026-09-10",
+          "close": 36900
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "태웅",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 36900,
+      "final_return_pct": 6.956521739130439
     },
-    "평화홀딩스": {
+    "평화홀딩스__2026-09-03": {
       "code": "010770",
       "entry_date": "2026-09-03",
       "entry_price": 3515.0,
       "score": 4,
       "depth_pct_at_entry": 7.352941176470589,
-      "running_low": 3515.0,
+      "running_low": 3495,
       "reached_breakeven": true,
       "reached_date": "2026-09-04",
       "leg_flipped": false,
@@ -521,11 +648,20 @@
         {
           "date": "2026-09-09",
           "close": 3530
+        },
+        {
+          "date": "2026-09-10",
+          "close": 3495
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "평화홀딩스",
+      "exit_date": "2026-09-10",
+      "exit_reason": "본전회복",
+      "final_price": 3495,
+      "final_return_pct": -0.5689900426742556
     },
-    "푸른로보틱스": {
+    "푸른로보틱스__2026-09-03": {
       "code": "094940",
       "entry_date": "2026-09-03",
       "entry_price": 6460.0,
@@ -556,11 +692,20 @@
         {
           "date": "2026-09-09",
           "close": 6410
+        },
+        {
+          "date": "2026-09-10",
+          "close": 6340
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "푸른로보틱스",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 6340,
+      "final_return_pct": -1.8575851393188847
     },
-    "제이아이테크": {
+    "제이아이테크__2026-09-03": {
       "code": "417500",
       "entry_date": "2026-09-03",
       "entry_price": 3460.0,
@@ -591,17 +736,26 @@
         {
           "date": "2026-09-09",
           "close": 3945
+        },
+        {
+          "date": "2026-09-10",
+          "close": 3880
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "제이아이테크",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 3880,
+      "final_return_pct": 12.138728323699421
     },
-    "나이벡": {
+    "나이벡__2026-09-03": {
       "code": "138610",
       "entry_date": "2026-09-03",
       "entry_price": 15100.0,
       "score": 4,
       "depth_pct_at_entry": 6.4797507788162,
-      "running_low": 14790,
+      "running_low": 14530,
       "reached_breakeven": true,
       "reached_date": "2026-09-04",
       "leg_flipped": false,
@@ -626,17 +780,26 @@
         {
           "date": "2026-09-09",
           "close": 14870
+        },
+        {
+          "date": "2026-09-10",
+          "close": 14530
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "나이벡",
+      "exit_date": "2026-09-10",
+      "exit_reason": "본전회복",
+      "final_price": 14530,
+      "final_return_pct": -3.7748344370860942
     },
-    "아이씨에이치": {
+    "아이씨에이치__2026-09-03": {
       "code": "368600",
       "entry_date": "2026-09-03",
       "entry_price": 1033.0,
       "score": 4,
       "depth_pct_at_entry": 6.220984215413185,
-      "running_low": 994,
+      "running_low": 956,
       "reached_breakeven": true,
       "reached_date": "2026-09-08",
       "leg_flipped": true,
@@ -661,11 +824,20 @@
         {
           "date": "2026-09-09",
           "close": 1051
+        },
+        {
+          "date": "2026-09-10",
+          "close": 956
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "아이씨에이치",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 956,
+      "final_return_pct": -7.454017424975801
     },
-    "SG&G": {
+    "SG&G__2026-09-03": {
       "code": "040610",
       "entry_date": "2026-09-03",
       "entry_price": 3130.0,
@@ -696,11 +868,20 @@
         {
           "date": "2026-09-09",
           "close": 3155
+        },
+        {
+          "date": "2026-09-10",
+          "close": 3165
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "SG&G",
+      "exit_date": "2026-09-10",
+      "exit_reason": "본전회복",
+      "final_price": 3165,
+      "final_return_pct": 1.1182108626198062
     },
-    "마이크로디지탈": {
+    "마이크로디지탈__2026-09-03": {
       "code": "305090",
       "entry_date": "2026-09-03",
       "entry_price": 538.0,
@@ -731,17 +912,26 @@
         {
           "date": "2026-09-09",
           "close": 538
+        },
+        {
+          "date": "2026-09-10",
+          "close": 538
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "마이크로디지탈",
+      "exit_date": "2026-09-10",
+      "exit_reason": "본전회복",
+      "final_price": 538,
+      "final_return_pct": 0.0
     },
-    "수성웹툰": {
+    "수성웹툰__2026-09-03": {
       "code": "084180",
       "entry_date": "2026-09-03",
       "entry_price": 385.0,
       "score": 3,
       "depth_pct_at_entry": 30.0,
-      "running_low": 381,
+      "running_low": 267,
       "reached_breakeven": true,
       "reached_date": "2026-09-04",
       "leg_flipped": true,
@@ -766,17 +956,26 @@
         {
           "date": "2026-09-09",
           "close": 381
+        },
+        {
+          "date": "2026-09-10",
+          "close": 267
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "수성웹툰",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 267,
+      "final_return_pct": -30.649350649350648
     },
-    "모아라이프플러스": {
+    "모아라이프플러스__2026-09-03": {
       "code": "142760",
       "entry_date": "2026-09-03",
       "entry_price": 549.0,
       "score": 3,
       "depth_pct_at_entry": 20.3240058910162,
-      "running_low": 505,
+      "running_low": 488,
       "reached_breakeven": true,
       "reached_date": "2026-09-07",
       "leg_flipped": true,
@@ -801,11 +1000,20 @@
         {
           "date": "2026-09-09",
           "close": 505
+        },
+        {
+          "date": "2026-09-10",
+          "close": 488
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "모아라이프플러스",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 488,
+      "final_return_pct": -11.111111111111116
     },
-    "데이타솔루션": {
+    "데이타솔루션__2026-09-03": {
       "code": "263800",
       "entry_date": "2026-09-03",
       "entry_price": 4610.0,
@@ -836,11 +1044,20 @@
         {
           "date": "2026-09-09",
           "close": 4700
+        },
+        {
+          "date": "2026-09-10",
+          "close": 4695
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "데이타솔루션",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 4695,
+      "final_return_pct": 1.8438177874186445
     },
-    "아크릴": {
+    "아크릴__2026-09-03": {
       "code": "0007C0",
       "entry_date": "2026-09-03",
       "entry_price": 14580.0,
@@ -871,11 +1088,20 @@
         {
           "date": "2026-09-09",
           "close": 16310
+        },
+        {
+          "date": "2026-09-10",
+          "close": 15680
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "아크릴",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 15680,
+      "final_return_pct": 7.544581618655699
     },
-    "제이스로보틱스": {
+    "제이스로보틱스__2026-09-03": {
       "code": "090470",
       "entry_date": "2026-09-03",
       "entry_price": 4450.0,
@@ -906,11 +1132,20 @@
         {
           "date": "2026-09-09",
           "close": 4395
+        },
+        {
+          "date": "2026-09-10",
+          "close": 4450
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "제이스로보틱스",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 4450,
+      "final_return_pct": 0.0
     },
-    "경남제약": {
+    "경남제약__2026-09-03": {
       "code": "053950",
       "entry_date": "2026-09-03",
       "entry_price": 1974.0,
@@ -941,11 +1176,20 @@
         {
           "date": "2026-09-09",
           "close": 2185
+        },
+        {
+          "date": "2026-09-10",
+          "close": 2030
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "경남제약",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 2030,
+      "final_return_pct": 2.8368794326241176
     },
-    "코람코더원리츠": {
+    "코람코더원리츠__2026-09-03": {
       "code": "417310",
       "entry_date": "2026-09-03",
       "entry_price": 2365.0,
@@ -976,21 +1220,30 @@
         {
           "date": "2026-09-09",
           "close": 2365
+        },
+        {
+          "date": "2026-09-10",
+          "close": 2370
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "코람코더원리츠",
+      "exit_date": "2026-09-10",
+      "exit_reason": "본전회복",
+      "final_price": 2370,
+      "final_return_pct": 0.21141649048626032
     },
-    "뷰노": {
+    "뷰노__2026-09-03": {
       "code": "338220",
       "entry_date": "2026-09-03",
       "entry_price": 5220.0,
       "score": 2,
       "depth_pct_at_entry": 37.530562347188265,
-      "running_low": 5050,
+      "running_low": 4960,
       "reached_breakeven": true,
       "reached_date": "2026-09-04",
-      "leg_flipped": false,
-      "leg_flip_date": null,
+      "leg_flipped": true,
+      "leg_flip_date": "2026-09-04",
       "history": [
         {
           "date": "2026-09-03",
@@ -1011,11 +1264,20 @@
         {
           "date": "2026-09-09",
           "close": 5050
+        },
+        {
+          "date": "2026-09-10",
+          "close": 4960
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "뷰노",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 4960,
+      "final_return_pct": -4.980842911877392
     },
-    "에스에너지": {
+    "에스에너지__2026-09-03": {
       "code": "095910",
       "entry_date": "2026-09-03",
       "entry_price": 615.0,
@@ -1046,11 +1308,20 @@
         {
           "date": "2026-09-09",
           "close": 628
+        },
+        {
+          "date": "2026-09-10",
+          "close": 624
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "에스에너지",
+      "exit_date": "2026-09-10",
+      "exit_reason": "본전회복",
+      "final_price": 624,
+      "final_return_pct": 1.4634146341463428
     },
-    "펩트론": {
+    "펩트론__2026-09-03": {
       "code": "087010",
       "entry_date": "2026-09-03",
       "entry_price": 146600.0,
@@ -1081,11 +1352,20 @@
         {
           "date": "2026-09-09",
           "close": 146500
+        },
+        {
+          "date": "2026-09-10",
+          "close": 151600
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "펩트론",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 151600,
+      "final_return_pct": 3.4106412005457054
     },
-    "아센디오": {
+    "아센디오__2026-09-03": {
       "code": "012170",
       "entry_date": "2026-09-03",
       "entry_price": 2975.0,
@@ -1116,17 +1396,26 @@
         {
           "date": "2026-09-09",
           "close": 3090
+        },
+        {
+          "date": "2026-09-10",
+          "close": 2955
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "아센디오",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 2955,
+      "final_return_pct": -0.6722689075630228
     },
-    "휴온스": {
+    "휴온스__2026-09-03": {
       "code": "243070",
       "entry_date": "2026-09-03",
       "entry_price": 20950.0,
       "score": 2,
       "depth_pct_at_entry": 20.306513409961685,
-      "running_low": 20750,
+      "running_low": 20250,
       "reached_breakeven": true,
       "reached_date": "2026-09-04",
       "leg_flipped": false,
@@ -1151,11 +1440,20 @@
         {
           "date": "2026-09-09",
           "close": 20750
+        },
+        {
+          "date": "2026-09-10",
+          "close": 20250
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "휴온스",
+      "exit_date": "2026-09-10",
+      "exit_reason": "본전회복",
+      "final_price": 20250,
+      "final_return_pct": -3.341288782816232
     },
-    "나무에이엑스": {
+    "나무에이엑스__2026-09-03": {
       "code": "242040",
       "entry_date": "2026-09-03",
       "entry_price": 2975.0,
@@ -1186,11 +1484,20 @@
         {
           "date": "2026-09-09",
           "close": 3100
+        },
+        {
+          "date": "2026-09-10",
+          "close": 3150
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "나무에이엑스",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 3150,
+      "final_return_pct": 5.882352941176472
     },
-    "더본코리아": {
+    "더본코리아__2026-09-03": {
       "code": "475560",
       "entry_date": "2026-09-03",
       "entry_price": 15090.0,
@@ -1221,10 +1528,18 @@
         {
           "date": "2026-09-09",
           "close": 15480
+        },
+        {
+          "date": "2026-09-10",
+          "close": 15140
         }
       ],
-      "days_elapsed": 4
+      "days_elapsed": 5,
+      "name": "더본코리아",
+      "exit_date": "2026-09-10",
+      "exit_reason": "다리전환",
+      "final_price": 15140,
+      "final_return_pct": 0.3313452617627499
     }
-  },
-  "completed": {}
+  }
 }
