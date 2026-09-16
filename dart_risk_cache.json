@@ -1900,7 +1900,7 @@
   "market_status": {
    "management_issue": true,
    "caution_issue": false,
-   "per": -0.7325551002053788
+   "per": -0.7983565407852304
   }
  },
  "483650": {
@@ -1941,7 +1941,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 25.84295261967348
+   "per": 25.367607077925957
   }
  },
  "214680": {
@@ -1982,7 +1982,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -2.827793517053301
+   "per": -2.775684299908584
   }
  },
  "300080": {
@@ -2023,7 +2023,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 23.267805017703576
+   "per": 23.293402162937575
   }
  },
  "200350": {
@@ -2064,7 +2064,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -5.74461125982573
+   "per": -5.297808161839284
   }
  },
  "354200": {
@@ -2105,7 +2105,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -2.180769330780313
+   "per": -2.0723259801896607
   }
  },
  "032685": {
@@ -2159,7 +2159,7 @@
   "market_status": {
    "management_issue": true,
    "caution_issue": false,
-   "per": -222.16483008725385
+   "per": -221.39476135211603
   }
  },
  "078520": {
@@ -2196,7 +2196,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 18.37839812922868
+   "per": 18.415228586401483
   }
  },
  "131290": {
@@ -2229,7 +2229,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 66.71014837666165
+   "per": 67.12449712434277
   }
  },
  "299170": {
@@ -2254,7 +2254,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -13.364641715188762
+   "per": -13.459679167385659
   }
  },
  "006370": {
@@ -2295,7 +2295,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -1.1042945633779233
+   "per": -1.0976321527391426
   }
  },
  "376180": {
@@ -2328,7 +2328,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -22.614937390639977
+   "per": -22.53030064890854
   }
  },
  "126640": {
@@ -2348,7 +2348,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 12.593429841990176
+   "per": 12.644415387909163
   }
  },
  "440110": {
@@ -2389,7 +2389,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -40.434294519827816
+   "per": -38.98786447196406
   }
  },
  "033230": {
@@ -2430,7 +2430,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -9.982554562948309
+   "per": -10.081391736838885
   }
  },
  "047920": {
@@ -2471,7 +2471,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 48.06827701728057
+   "per": 47.350840046873394
   }
  },
  "355390": {
@@ -2512,7 +2512,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -0.8808960177369304
+   "per": -0.9182097194849232
   }
  }
 }
