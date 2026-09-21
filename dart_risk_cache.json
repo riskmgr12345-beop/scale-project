@@ -37,7 +37,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 3.682625598004586
+   "per": 3.3886344788361527
   }
  },
  "314930": {
@@ -681,7 +681,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 5.714211057425978
+   "per": 5.527045831723688
   }
  },
  "242040": {
@@ -778,9 +778,9 @@
    }
   ],
   "market_status": {
-   "management_issue": true,
-   "caution_issue": false,
-   "per": -0.3599159109088389
+   "management_issue": null,
+   "caution_issue": null,
+   "per": null
   }
  },
  "121850": {
@@ -928,7 +928,7 @@
   "market_status": {
    "management_issue": true,
    "caution_issue": false,
-   "per": -2.16017291748169
+   "per": -1.241776048372708
   }
  },
  "219130": {
@@ -2105,7 +2105,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -1.7787354456637485
+   "per": -1.8316346410738227
   }
  },
  "032685": {
@@ -2513,6 +2513,548 @@
    "management_issue": false,
    "caution_issue": false,
    "per": -1.119411052439787
+  }
+ },
+ "001020": {
+  "checked_at": 1790001601.6057298,
+  "capital": {
+   "warning": false,
+   "equity": 263732752852,
+   "net_income_3y": [
+    -19327198235,
+    -9682981858,
+    15232336453
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20260915",
+    "title": "주주총회소집공고"
+   },
+   {
+    "date": "20260911",
+    "title": "[기재정정]주주총회소집결의              "
+   },
+   {
+    "date": "20260813",
+    "title": "주주총회소집결의              "
+   },
+   {
+    "date": "20260813",
+    "title": "주주명부폐쇄기간또는기준일설정              "
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -3.711209098073392
+  }
+ },
+ "027740": {
+  "checked_at": 1790001601.6057298,
+  "capital": {
+   "warning": true,
+   "equity": 41565941039,
+   "net_income_3y": [
+    -317490159,
+    -10708064322,
+    -1770258825
+   ],
+   "fiscal_year": "2025",
+   "reason": "3년 연속 당기순손실"
+  },
+  "disclosures": [
+   {
+    "date": "20260915",
+    "title": "최대주주등소유주식변동신고서              "
+   },
+   {
+    "date": "20260915",
+    "title": "임원ㆍ주요주주특정증권등거래계획철회보고서"
+   },
+   {
+    "date": "20260915",
+    "title": "임원ㆍ주요주주특정증권등소유상황보고서"
+   },
+   {
+    "date": "20260915",
+    "title": "주식등의대량보유상황보고서(일반)"
+   },
+   {
+    "date": "20260914",
+    "title": "최대주주등소유주식변동신고서              "
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -122.42543724323751
+  }
+ },
+ "004870": {
+  "checked_at": 1790001601.6057298,
+  "capital": {
+   "warning": false,
+   "equity": 94178185920,
+   "net_income_3y": [
+    -55732748754,
+    -20751192697,
+    4560758532
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20260918",
+    "title": "타인에대한채무보증결정              "
+   },
+   {
+    "date": "20260910",
+    "title": "투자유의안내              (관리종목지정 우려 예고)"
+   },
+   {
+    "date": "20260910",
+    "title": "단일판매ㆍ공급계약체결              "
+   },
+   {
+    "date": "20260831",
+    "title": "대규모기업집단현황공시[분기별공시(개별회사용)]"
+   },
+   {
+    "date": "20260807",
+    "title": "임원ㆍ주요주주특정증권등소유상황보고서"
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -0.36873275127175686
+  }
+ },
+ "053030": {
+  "checked_at": 1790001601.6057298,
+  "capital": {
+   "warning": false,
+   "equity": 187455536402,
+   "net_income_3y": [
+    -3289252936,
+    -35180012451,
+    4583698556
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20260918",
+    "title": "주식등의대량보유상황보고서(일반)"
+   },
+   {
+    "date": "20260731",
+    "title": "주식등의대량보유상황보고서(일반)"
+   },
+   {
+    "date": "20260728",
+    "title": "[기재정정]단일판매ㆍ공급계약체결              "
+   },
+   {
+    "date": "20260724",
+    "title": "주식등의대량보유상황보고서(일반)"
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -61.01109225246884
+  }
+ },
+ "052020": {
+  "checked_at": 1790001601.6057298,
+  "capital": {
+   "warning": true,
+   "equity": 72121558592,
+   "net_income_3y": [
+    -21799678281,
+    -21436613481,
+    -24499001254
+   ],
+   "fiscal_year": "2025",
+   "reason": "3년 연속 당기순손실"
+  },
+  "disclosures": [],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": true,
+   "per": -24.04398665217164
+  }
+ },
+ "002360": {
+  "checked_at": 1790001601.6057298,
+  "capital": {
+   "warning": true,
+   "equity": 69692952315,
+   "net_income_3y": [
+    -10784068601,
+    -10416230655,
+    -2582296699
+   ],
+   "fiscal_year": "2025",
+   "reason": "3년 연속 당기순손실"
+  },
+  "disclosures": [
+   {
+    "date": "20260911",
+    "title": "기타경영사항(자율공시)              "
+   },
+   {
+    "date": "20260828",
+    "title": "최대주주등소유주식변동신고서              "
+   },
+   {
+    "date": "20260828",
+    "title": "임원ㆍ주요주주특정증권등소유상황보고서"
+   },
+   {
+    "date": "20260812",
+    "title": "최대주주등소유주식변동신고서              "
+   },
+   {
+    "date": "20260812",
+    "title": "임원ㆍ주요주주특정증권등소유상황보고서"
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -1.9064919568569425
+  }
+ },
+ "004720": {
+  "checked_at": 1790001601.6057298,
+  "capital": {
+   "warning": false,
+   "equity": 146303982147,
+   "net_income_3y": [
+    -116641027852,
+    2789765616,
+    6087851018
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -0.5525643044467983
+  }
+ },
+ "004370": {
+  "checked_at": 1790001601.6057298,
+  "capital": {
+   "warning": false,
+   "equity": 2831185859403,
+   "net_income_3y": [
+    170054449646,
+    157630314203,
+    171469224876
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20260903",
+    "title": "[기재정정]자기주식처분결과보고서"
+   },
+   {
+    "date": "20260903",
+    "title": "[기재정정]주요사항보고서(자기주식처분결정)"
+   },
+   {
+    "date": "20260824",
+    "title": "대규모기업집단현황공시[분기별공시(대표회사용)]"
+   },
+   {
+    "date": "20260813",
+    "title": "지급수단별ㆍ지급기간별지급금액및분쟁조정기구에관한사항"
+   },
+   {
+    "date": "20260728",
+    "title": "기업가치제고계획(자율공시)              (2026년)"
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": 14.110787891732436
+  }
+ },
+ "179290": {
+  "checked_at": 1790001601.6057298,
+  "capital": {
+   "warning": false,
+   "equity": 125932489267,
+   "net_income_3y": [
+    null,
+    null,
+    null
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20260727",
+    "title": "타법인주식및출자증권취득결정(자율공시)              "
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": null
+  }
+ },
+ "006490": {
+  "checked_at": 1790001601.6057298,
+  "capital": {
+   "warning": false,
+   "equity": 16065801836,
+   "net_income_3y": [
+    -41682609189,
+    2863841827,
+    -30303127067
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20260921",
+    "title": "주주명부폐쇄기간또는기준일설정              "
+   },
+   {
+    "date": "20260917",
+    "title": "의결권대리행사권유참고서류"
+   },
+   {
+    "date": "20260917",
+    "title": "주주총회소집공고"
+   },
+   {
+    "date": "20260917",
+    "title": "주주총회소집결의              "
+   },
+   {
+    "date": "20260917",
+    "title": "[기재정정]주주총회소집결의              "
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -0.6279799101901659
+  }
+ },
+ "224060": {
+  "checked_at": 1790001601.6057298,
+  "capital": {
+   "warning": true,
+   "equity": 10751874697,
+   "net_income_3y": [
+    -15723843138,
+    -7820775245,
+    -13678159844
+   ],
+   "fiscal_year": "2025",
+   "reason": "3년 연속 당기순손실"
+  },
+  "disclosures": [
+   {
+    "date": "20260918",
+    "title": "[기재정정]주요사항보고서(자기전환사채매도결정)"
+   },
+   {
+    "date": "20260918",
+    "title": "[기재정정]주요사항보고서(유상증자결정)"
+   },
+   {
+    "date": "20260918",
+    "title": "[기재정정]주요사항보고서(유상증자결정)"
+   },
+   {
+    "date": "20260917",
+    "title": "[첨부추가]주주명부폐쇄기간또는기준일설정              "
+   },
+   {
+    "date": "20260917",
+    "title": "[기재정정]주요사항보고서(자기전환사채매도결정)"
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": true,
+   "per": -1.7165381149581398
+  }
+ },
+ "081660": {
+  "checked_at": 1790001601.6057298,
+  "capital": {
+   "warning": false,
+   "equity": 2594417063998,
+   "net_income_3y": [
+    348617792581,
+    207722009422,
+    153056827039
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20260914",
+    "title": "기업설명회(IR)개최(안내공시)              "
+   },
+   {
+    "date": "20260914",
+    "title": "주식등의대량보유상황보고서(일반)"
+   },
+   {
+    "date": "20260907",
+    "title": "기업설명회(IR)개최(안내공시)              "
+   },
+   {
+    "date": "20260812",
+    "title": "주요사항보고서(자기주식취득결정)"
+   },
+   {
+    "date": "20260811",
+    "title": "기업설명회(IR)개최(안내공시)              "
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": 5.863257365227784
+  }
+ },
+ "950250": {
+  "checked_at": 1790001601.6057298,
+  "capital": {
+   "warning": null,
+   "reason": "재무제표 조회 실패(연도 3개 다 없음)"
+  },
+  "disclosures": [
+   {
+    "date": "20260914",
+    "title": "기업설명회(IR)개최              "
+   },
+   {
+    "date": "20260911",
+    "title": "조회공시요구(현저한시황변동)에대한답변(미확정)              "
+   },
+   {
+    "date": "20260910",
+    "title": "조회공시요구(현저한시황변동)              "
+   },
+   {
+    "date": "20260901",
+    "title": "임원ㆍ주요주주특정증권등소유상황보고서"
+   },
+   {
+    "date": "20260901",
+    "title": "주식등의대량보유상황보고서(일반)"
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": null
+  }
+ },
+ "393210": {
+  "checked_at": 1790001601.6057298,
+  "capital": {
+   "warning": false,
+   "equity": 24729795963,
+   "net_income_3y": [
+    -2777547635,
+    -1824489661,
+    3289307797
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20260915",
+    "title": "임원ㆍ주요주주특정증권등소유상황보고서"
+   },
+   {
+    "date": "20260826",
+    "title": "[기재정정]단일판매ㆍ공급계약체결              "
+   },
+   {
+    "date": "20260824",
+    "title": "주식등의대량보유상황보고서(일반)"
+   },
+   {
+    "date": "20260818",
+    "title": "주식매수선택권부여에관한신고"
+   },
+   {
+    "date": "20260804",
+    "title": "임원ㆍ주요주주특정증권등소유상황보고서"
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -14.335339094913488
+  }
+ },
+ "145020": {
+  "checked_at": 1790001601.6057298,
+  "capital": {
+   "warning": false,
+   "equity": 980161908525,
+   "net_income_3y": [
+    146974291500,
+    143134582847,
+    97660299628
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20260914",
+    "title": "기업설명회(IR)개최              "
+   },
+   {
+    "date": "20260909",
+    "title": "임원ㆍ주요주주특정증권등소유상황보고서"
+   },
+   {
+    "date": "20260907",
+    "title": "기업설명회(IR)개최              "
+   },
+   {
+    "date": "20260831",
+    "title": "대규모기업집단현황공시[분기별공시(개별회사용)]"
+   },
+   {
+    "date": "20260824",
+    "title": "[기재정정]임시주주총회결과              "
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": 17.541337411379867
   }
  }
 }
