@@ -1448,7 +1448,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -17.68082322596959
+   "per": -16.91291505625304
   }
  },
  "321370": {
@@ -2549,7 +2549,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -3.609910586711587
+   "per": -3.3152240082045186
   }
  },
  "027740": {
@@ -5531,6 +5531,529 @@
    "management_issue": false,
    "caution_issue": false,
    "per": 21.720240260048094
+  }
+ },
+ "289010": {
+  "checked_at": 1793025570.8217463,
+  "capital": {
+   "warning": true,
+   "equity": 42567459598,
+   "net_income_3y": [
+    -1057960650,
+    -6212111382,
+    -23465565405
+   ],
+   "fiscal_year": "2025",
+   "reason": "3년 연속 당기순손실"
+  },
+  "disclosures": [
+   {
+    "date": "20261023",
+    "title": "주권매매거래정지기간변경              "
+   },
+   {
+    "date": "20261023",
+    "title": "기타시장안내              "
+   },
+   {
+    "date": "20261022",
+    "title": "주권매매거래정지              "
+   },
+   {
+    "date": "20261015",
+    "title": "기타시장안내              (주가 미달에 따른 상장폐지 우려 관련 안내)"
+   },
+   {
+    "date": "20261007",
+    "title": "기타시장안내              "
+   }
+  ],
+  "market_status": {
+   "management_issue": true,
+   "caution_issue": false,
+   "per": -6.946524818290737
+  }
+ },
+ "096690": {
+  "checked_at": 1793025570.8217463,
+  "capital": {
+   "warning": true,
+   "equity": 105151832974,
+   "net_income_3y": [
+    -18545662682,
+    -45299596818,
+    -13246183446
+   ],
+   "fiscal_year": "2025",
+   "reason": "3년 연속 당기순손실"
+  },
+  "disclosures": [
+   {
+    "date": "20261026",
+    "title": "[기재정정]주요사항보고서(유상증자결정)"
+   },
+   {
+    "date": "20261026",
+    "title": "해산사유발생(종속회사의주요경영사항)              "
+   },
+   {
+    "date": "20261026",
+    "title": "회사합병결정(종속회사의주요경영사항)              "
+   },
+   {
+    "date": "20261026",
+    "title": "주주명부폐쇄기간또는기준일설정              "
+   },
+   {
+    "date": "20261026",
+    "title": "주요사항보고서(회사합병결정)"
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -1.0422790569118365
+  }
+ },
+ "065650": {
+  "checked_at": 1793025570.8217463,
+  "capital": {
+   "warning": true,
+   "equity": 15312036023,
+   "net_income_3y": [
+    -756373534,
+    -81184854824,
+    -1960393378
+   ],
+   "fiscal_year": "2025",
+   "reason": "3년 연속 당기순손실"
+  },
+  "disclosures": [
+   {
+    "date": "20261015",
+    "title": "주주총회소집공고"
+   },
+   {
+    "date": "20261015",
+    "title": "[기재정정]주주총회소집결의              "
+   },
+   {
+    "date": "20261014",
+    "title": "주요사항보고서(유상증자결정)"
+   },
+   {
+    "date": "20261008",
+    "title": "불성실공시법인지정예고              (공시번복)"
+   },
+   {
+    "date": "20261006",
+    "title": "주식등의대량보유상황보고서(일반)"
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -27.930320087058995
+  }
+ },
+ "457550": {
+  "checked_at": 1793025570.8217463,
+  "capital": {
+   "warning": false,
+   "equity": 51094937588,
+   "net_income_3y": [
+    5308948266,
+    5409222285,
+    5266178665
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20261015",
+    "title": "주권매매거래정지해제              (상장적격성 실질심사 대상 제외 결정)"
+   },
+   {
+    "date": "20261015",
+    "title": "기타시장안내              (상장적격성 실질심사 대상 제외 결정)"
+   },
+   {
+    "date": "20261008",
+    "title": "[기재정정]거래처와의거래중단              "
+   },
+   {
+    "date": "20261002",
+    "title": "[기재정정]거래처와의거래중단              "
+   },
+   {
+    "date": "20261001",
+    "title": "기타시장안내              (상장적격성 실질심사 대상결정 기한 안내)"
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": 14.341048931969382
+  }
+ },
+ "122690": {
+  "checked_at": 1793025570.8217463,
+  "capital": {
+   "warning": false,
+   "equity": 415482211025,
+   "net_income_3y": [
+    -23040075800,
+    11044705938,
+    38345370639
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -1.5075534096116125
+  }
+ },
+ "101360": {
+  "checked_at": 1793025570.8217463,
+  "capital": {
+   "warning": false,
+   "equity": 213687331285,
+   "net_income_3y": [
+    -8596919787,
+    13515181751,
+    -10150669449
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20261014",
+    "title": "증권발행결과(자율공시)              "
+   },
+   {
+    "date": "20261006",
+    "title": "주요사항보고서(전환사채권발행결정)"
+   },
+   {
+    "date": "20260923",
+    "title": "단일판매ㆍ공급계약체결              "
+   },
+   {
+    "date": "20260911",
+    "title": "풍문또는보도에대한해명(미확정)              "
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -19.05451184826787
+  }
+ },
+ "00088K": {
+  "checked_at": 1793025570.8217463,
+  "capital": {
+   "warning": null,
+   "reason": "DART 미등록(비상장/코드 불일치 등)"
+  },
+  "disclosures": [],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": null
+  }
+ },
+ "293780": {
+  "checked_at": 1793025570.8217463,
+  "capital": {
+   "warning": true,
+   "equity": 47184636625,
+   "net_income_3y": [
+    -16346165951,
+    -29377949531,
+    -12061643748
+   ],
+   "fiscal_year": "2025",
+   "reason": "3년 연속 당기순손실"
+  },
+  "disclosures": [
+   {
+    "date": "20261014",
+    "title": "투자판단관련주요경영사항(임상시험결과)              (조영제유발급성신장손상(CIAKI) 치료제 Isuzinaxib(APX115)의 임상시험 제2상 Topline data수령)"
+   },
+   {
+    "date": "20260902",
+    "title": "기업설명회(IR)개최              "
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -9.951007192610142
+  }
+ },
+ "053800": {
+  "checked_at": 1793025570.8217463,
+  "capital": {
+   "warning": false,
+   "equity": 376267704694,
+   "net_income_3y": [
+    51495359406,
+    32395312129,
+    34702787067
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20261023",
+    "title": "결산실적공시예고              "
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": 17.328664009596718
+  }
+ },
+ "097780": {
+  "checked_at": 1793025570.8217463,
+  "capital": {
+   "warning": false,
+   "equity": 216627479328,
+   "net_income_3y": [
+    -24908902623,
+    -20609109574,
+    15275721402
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20261020",
+    "title": "주권매매거래정지              (주식의 병합, 분할 등 전자등록 변경, 말소)"
+   },
+   {
+    "date": "20260923",
+    "title": "임시주주총회결과              "
+   },
+   {
+    "date": "20260908",
+    "title": "의결권대리행사권유참고서류"
+   },
+   {
+    "date": "20260908",
+    "title": "주주총회소집공고"
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -1.0183652661830875
+  }
+ },
+ "290720": {
+  "checked_at": 1793025570.8217463,
+  "capital": {
+   "warning": false,
+   "equity": 35026768109,
+   "net_income_3y": [
+    2030815890,
+    -45472723233,
+    -19992768396
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20261021",
+    "title": "조회공시요구(현저한시황변동)에대한답변(미확정)              "
+   },
+   {
+    "date": "20261020",
+    "title": "조회공시요구(현저한시황변동)              "
+   },
+   {
+    "date": "20261014",
+    "title": "독립이사의선임ㆍ해임또는중도퇴임에관한신고"
+   },
+   {
+    "date": "20260911",
+    "title": "주식등의대량보유상황보고서(일반)"
+   },
+   {
+    "date": "20260904",
+    "title": "[기재정정]최대주주변경을수반하는주식담보제공계약체결              "
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": 25.49150994726558
+  }
+ },
+ "019550": {
+  "checked_at": 1793025570.8217463,
+  "capital": {
+   "warning": false,
+   "equity": 146906983534,
+   "net_income_3y": [
+    9324127663,
+    11389847353,
+    8318470367
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20261026",
+    "title": "기타시장안내(관리종목지정우려종목)              (주가 1,000원 미달)"
+   },
+   {
+    "date": "20261022",
+    "title": "주주총회소집결의              (임시주주총회)"
+   },
+   {
+    "date": "20261022",
+    "title": "주식병합결정              "
+   },
+   {
+    "date": "20261022",
+    "title": "주주명부폐쇄기간또는기준일설정              "
+   },
+   {
+    "date": "20261019",
+    "title": "임원ㆍ주요주주특정증권등소유상황보고서"
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": 5.9531455480029924
+  }
+ },
+ "024720": {
+  "checked_at": 1793025570.8217463,
+  "capital": {
+   "warning": false,
+   "equity": 806907204020,
+   "net_income_3y": [
+    11144466434,
+    33395004283,
+    6049009666
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20261008",
+    "title": "주식등의대량보유상황보고서(일반)"
+   },
+   {
+    "date": "20261001",
+    "title": "타인에대한채무보증결정(자회사의 주요경영사항)              "
+   },
+   {
+    "date": "20260930",
+    "title": "주식등의대량보유상황보고서(일반)"
+   },
+   {
+    "date": "20260828",
+    "title": "대규모기업집단현황공시[분기별공시(대표회사용)]"
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": 24.804045054742367
+  }
+ },
+ "004545": {
+  "checked_at": 1793025570.8217463,
+  "capital": {
+   "warning": null,
+   "reason": "DART 미등록(비상장/코드 불일치 등)"
+  },
+  "disclosures": [],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": null
+  }
+ },
+ "444530": {
+  "checked_at": 1793025570.8217463,
+  "capital": {
+   "warning": true,
+   "equity": 14793200992,
+   "net_income_3y": [
+    -2529605356,
+    -8022172685,
+    -1193400696
+   ],
+   "fiscal_year": "2025",
+   "reason": "3년 연속 당기순손실"
+  },
+  "disclosures": [
+   {
+    "date": "20261021",
+    "title": "임원ㆍ주요주주특정증권등소유상황보고서"
+   },
+   {
+    "date": "20261021",
+    "title": "주식등의대량보유상황보고서(일반)"
+   },
+   {
+    "date": "20261021",
+    "title": "[기재정정]임원ㆍ주요주주특정증권등소유상황보고서"
+   },
+   {
+    "date": "20261021",
+    "title": "[기재정정]주식등의대량보유상황보고서(일반)"
+   },
+   {
+    "date": "20261020",
+    "title": "투자판단관련주요경영사항              (국책과제 선정  충북청주 첨단 반도체패키징분야 AX 실증산단 구축사업)"
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -9.229654390406026
+  }
+ },
+ "225530": {
+  "checked_at": 1793025570.8217463,
+  "capital": {
+   "warning": false,
+   "equity": 91943542228,
+   "net_income_3y": [
+    -2492104615,
+    5238946053,
+    16662368432
+   ],
+   "fiscal_year": "2025",
+   "reason": null
+  },
+  "disclosures": [
+   {
+    "date": "20261026",
+    "title": "전환가액의조정              "
+   }
+  ],
+  "market_status": {
+   "management_issue": false,
+   "caution_issue": false,
+   "per": -33.391730158165934
   }
  }
 }
