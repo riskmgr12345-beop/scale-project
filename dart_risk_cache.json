@@ -525,7 +525,7 @@
   }
  },
  "095910": {
-  "checked_at": 1788572395.3673942,
+  "checked_at": 1793807448.3729918,
   "capital": {
    "warning": true,
    "equity": 66312358968,
@@ -539,30 +539,30 @@
   },
   "disclosures": [
    {
-    "date": "20260814",
-    "title": "주주명부폐쇄기간또는기준일설정              "
+    "date": "20261029",
+    "title": "기타시장안내              (주가 미달에 따른 상장폐지 우려 관련 안내)"
    },
    {
-    "date": "20260814",
-    "title": "주주총회소집결의              (임시주주총회)"
+    "date": "20261027",
+    "title": "주권매매거래정지해제              (액면병합 주권 변경상장)"
    },
    {
-    "date": "20260814",
-    "title": "주식병합결정              "
+    "date": "20261021",
+    "title": "[기재정정]단일판매ㆍ공급계약체결              "
    },
    {
-    "date": "20260814",
-    "title": "임원ㆍ주요주주특정증권등소유상황보고서"
+    "date": "20261020",
+    "title": "단일판매ㆍ공급계약체결              "
    },
    {
-    "date": "20260805",
-    "title": "기타시장안내(관리종목지정우려종목)              (주가 1,000원 미달)"
+    "date": "20260930",
+    "title": "주권매매거래정지              (주식의 병합, 분할 등 전자등록 변경, 말소)"
    }
   ],
   "market_status": {
    "management_issue": true,
    "caution_issue": false,
-   "per": -0.62604840253438
+   "per": -0.6006509014173667
   }
  },
  "087010": {
@@ -2023,7 +2023,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 22.6635206589222
+   "per": 22.3045961235999
   }
  },
  "200350": {
@@ -4372,7 +4372,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 44.14940154061196
+   "per": 45.02256646601343
   }
  },
  "227610": {
@@ -5714,7 +5714,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -1.3532921304885637
+   "per": -1.3913566019604848
   }
  },
  "101360": {
@@ -6094,7 +6094,7 @@
   "market_status": {
    "management_issue": true,
    "caution_issue": false,
-   "per": -0.41756900583286594
+   "per": -0.419206531345936
   }
  },
  "071950": {
@@ -6135,7 +6135,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -0.423522540847207
+   "per": -0.4593908993554395
   }
  },
  "047040": {
@@ -6176,7 +6176,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -4.790260370778291
+   "per": -4.98312665911487
   }
  },
  "090370": {
@@ -6201,7 +6201,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -2.273294547121258
+   "per": -2.185011263737908
   }
  },
  "122450": {
@@ -6242,7 +6242,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 3.735584355903131
+   "per": 3.7180464011805814
   }
  },
  "012160": {
@@ -6283,7 +6283,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -0.4667061442103129
+   "per": -0.44318438402270033
   }
  },
  "011370": {
@@ -6320,7 +6320,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 2.4619404569701193
+   "per": 2.4410174502536597
   }
  },
  "317240": {
@@ -6361,7 +6361,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -12.971682707508768
+   "per": -12.49232601171057
   }
  },
  "429270": {
@@ -6402,7 +6402,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -2.2162674735132795
+   "per": -2.1534582738590573
   }
  },
  "033240": {
@@ -6431,7 +6431,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 7.958072727897568
+   "per": 8.100181169467167
   }
  },
  "307950": {
@@ -6472,7 +6472,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 43.237817946574054
+   "per": 43.531453382544
   }
  },
  "006360": {
@@ -6513,7 +6513,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 25.37498552818899
+   "per": 26.291049987690396
   }
  },
  "003550": {
@@ -6554,7 +6554,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 14.316150524586526
+   "per": 14.195211555001844
   }
  },
  "041650": {
@@ -6574,7 +6574,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -3.3400996108016168
+   "per": -3.3454580593750953
   }
  },
  "376900": {
@@ -6599,7 +6599,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": -125.3642296338631
+   "per": -120.68645987140553
   }
  },
  "042110": {
@@ -6619,7 +6619,7 @@
   "market_status": {
    "management_issue": false,
    "caution_issue": false,
-   "per": 6.755229490001335
+   "per": 6.777898045336911
   }
  }
 }
